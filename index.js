@@ -91,13 +91,12 @@ function throwDices(difficulty, diceNumber, special) {
 }
 
 function parseResult(res) {
-  const result = {values: res.values, task: res.task};
-  result.success = res.success - res.one;
-  if (result.success < 0) {
+  const result = {success: res.success, values: res.values, task: res.task};
+  if (result.success === 0 && res.one > 0) {
     result.msg = 'Botch!';
-    result.success = 0;
     return result;
   }
+  result.success = result.success - res.one;
   if (result.success === 0) {
     result.msg = 'Fail!';
     return result;
