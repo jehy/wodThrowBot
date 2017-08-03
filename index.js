@@ -33,6 +33,11 @@ function parseRequest(str) {
   str = str.trim();
   let difficulty = 6;
   let diceNumber = str;
+  let special = false;
+  if (str.indexOf('spec') !== -1) {
+    special = true;
+    str = str.replace('spec', '').trim();
+  }
   if (str.indexOf('x') !== -1) {
     const arr = str.split('x');
     if (arr.length > 2) {
@@ -52,22 +57,32 @@ function parseRequest(str) {
   if (diceNumber > 20) {
     throw new Error('Please spare me, Kain!');
   }
-  return {difficulty, diceNumber};
+  return {difficulty, diceNumber, special};
 }
 
-function throwDices(difficulty, diceNumber) {
+function throwDices(difficulty, diceNumber, special) {
   const res = {
     values: [],
     one: 0,
     success: 0,
     task: `throwing ${diceNumber} dices with ${difficulty} difficulty`
   };
+  if (special) {
+    res.task += ' using speciality';
+  }
   for (let i = 0; i < diceNumber; i++) {
     const val = randomDice();
     if (val === 1) {
       res.one++;
     }
-    else if (val >= difficulty || val === 0) {
+    else if (val === 0) {
+      if (special) {
+        res.success += 2;
+      }
+      else
+        res.success++;
+    }
+    else if (val >= difficulty) {
       res.success++;
     }
     res.values.push(val);
@@ -134,13 +149,16 @@ bot.on('webhook_error', (error) => {
 bot.onText(/\/start/, function (msg, match) {
   console.log('start');
   const chatId = msg.chat.id || msg.from.id;
-  bot.sendMessage(chatId, 'Please enter message as "axb" where a is a number of dice and x is difficulty');
+  bot.sendMessage(chatId, 'Please enter message' +
+    ' as "axb" where a is a number of dice and x' +
+    ' is difficulty. You can also add keyword "spec"' +
+    ' if it is speciality.');
 });
 
 // Listen for any kind of message. There are different kinds of
 // messages.
 bot.on('message', (msg) => {
-  if (!msg || msg.text[0] === '/start') {
+  if (!msg || msg.text === '/start') {
     return;
   }
   msg.text = msg.text.replace('/roll', '').trim();
@@ -155,7 +173,7 @@ bot.on('message', (msg) => {
     bot.sendMessage(chatId, e.toString());
     return;
   }
-  const res = throwDices(params.difficulty, params.diceNumber);
+  const res = throwDices(params.difficulty, params.diceNumber, params.special);
   const reply = parseResult(res);
   const resStr = resultToStr(reply);
   // send a message to the chat acknowledging receipt of their message
