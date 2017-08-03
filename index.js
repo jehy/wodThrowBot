@@ -97,6 +97,9 @@ function parseResult(res) {
     return result;
   }
   result.success = result.success - res.one;
+  if (result.success < 0) {
+    result.success = 0;
+  }
   if (result.success === 0) {
     result.msg = 'Fail!';
     return result;
