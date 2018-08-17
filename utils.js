@@ -11,36 +11,28 @@ function randomDice() {
 function parseRequest(str) {
   str = str.trim();
   let difficulty = 6;
-  let diceNumber = str;
   let special = false;
   let damage = false;
-  str = str.replace('damage', 'dmg');
-  if (str.includes('spec')) {
+  const arr = str.trim().replace('х', 'x').replace('x', ' ').split(' ').map(el=>el.trim());
+  const diceNumber = parseInt(arr[0], 10);
+  if (!Number.isNaN(parseInt(arr[1], 10)))
+  {
+    difficulty = parseInt(arr[1], 10);
+  }
+  if (arr.includes('spec') || arr.includes('s')) {
     special = true;
-    str = str.replace('spec', '').trim();
   }
-  if (str.includes('dmg')) {
+  if (arr.includes('dmg') || arr.includes('d') || arr.includes('damage')) {
     damage = true;
-    str = str.replace('dmg', '').trim();
-  }
-  str = str.replace('х', 'x'); // replace russian with english
-  if (str.includes('x')) {
-    const arr = str.split('x');
-    if (arr.length > 2) {
-      throw new Error('too many x!');
-    }
-    [diceNumber, difficulty] = arr;
-  }
-  difficulty = parseInt(difficulty, 10);
-  diceNumber = parseInt(diceNumber, 10);
-  if (Number.isNaN(difficulty)) {
-    throw new Error('Wrong value for difficulty!');
   }
   if (Number.isNaN(diceNumber)) {
     throw new Error('Wrong value for dice number!');
   }
   if (diceNumber > 20) {
     throw new Error('Please spare me, Kain!');
+  }
+  if (difficulty > 10) {
+    throw new Error('You don`t like easy task, yeah?');
   }
   return {
     difficulty, diceNumber, special, damage,
