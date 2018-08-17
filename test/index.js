@@ -1,6 +1,7 @@
 'use strict';
 
 const debug = require('debug')('throwBot:test');
+const assert = require('chai').assert;
 
 const utils = require('../utils');
 
@@ -73,4 +74,19 @@ describe('Some simple tests', ()=>{
       debug(resStr);
     }
   });
+
+  it('should be able to pass message', ()=>{
+    for (let i = 0; i < 10; i++)
+    {
+      const test = '5 8 spec damage message Blah-blah blah!';
+      const params = utils.parseRequest(test);
+      const res = utils.throwDices(params);
+      const reply = utils.parseResult(res);
+      const resStr = utils.resultToStr(reply);
+      assert.length(res.values, 5);
+      assert.isTrue(resStr.indexOf('Blah-blah blah!') > -1);
+      debug(resStr);
+    }
+  });
+
 });
