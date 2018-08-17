@@ -40,7 +40,9 @@ function parseRequest(str) {
 }
 
 function throwDices(options) {
-  const {difficulty, diceNumber, special, damage} = options;
+  const {
+    difficulty, diceNumber, special, damage,
+  } = options;
   const res = {
     values: [],
     one: 0,

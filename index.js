@@ -38,7 +38,13 @@ bot.on('message', (msg) => {
   if (!msg || msg.text === '/start') {
     return;
   }
-  msg.text = msg.text.replace('/roll', '').toLowerCase().trim();
+  msg.text = msg.text
+    .replace('/roll', '')
+    .replace('/roll@WodThrowBot', '')
+    .replace('/хуйни', '')
+    .replace('/хуйни@WodThrowBot', '')
+    .toLowerCase()
+    .trim();
   debug('message');
   debug(msg);
   const chatId = msg.chat.id || msg.from.id;
