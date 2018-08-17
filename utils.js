@@ -14,13 +14,14 @@ function parseRequest(str) {
   let diceNumber = str;
   let special = false;
   let damage = false;
+  str = str.replace('damage', 'dmg');
   if (str.includes('spec')) {
     special = true;
     str = str.replace('spec', '').trim();
   }
-  if (str.includes('damage')) {
+  if (str.includes('dmg')) {
     damage = true;
-    str = str.replace('damage', '').trim();
+    str = str.replace('dmg', '').trim();
   }
   str = str.replace('х', 'x'); // replace russian with english
   if (str.includes('x')) {
