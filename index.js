@@ -43,6 +43,8 @@ bot.on('message', (msg) => {
     .replace('/roll@WodThrowBot', '')
     .replace('/хуйни', '')
     .replace('/хуйни@WodThrowBot', '')
+    .replace('/кшдд', '')
+    .replace('/кшдд@WodThrowBot', '')
     .toLowerCase()
     .trim();
   debug('message');
