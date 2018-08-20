@@ -236,6 +236,21 @@ describe('Some simple tests', ()=>{
         debug(test);
         debug(resStr);
       });
+      it('should be able to endure Rider roll', ()=>{
+        const test = '6 7 No damage intended!';
+        const params = utils.parseRequest(test);
+        assert.equal(params.diceNumber, 6);
+        assert.equal(params.difficulty, 7);
+        assert.equal(params.damage, false);
+        assert.equal(params.special, false);
+        assert.equal(params.action, 'No damage intended!');
+        const res = utils.throwDices(params);
+        const reply = utils.parseResult(res);
+        const resStr = utils.resultToStr(reply);
+        assert.isTrue(resStr.includes('Action: No damage intended!'));
+        debug(test);
+        debug(resStr);
+      });
     });
   });
 

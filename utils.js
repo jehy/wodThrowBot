@@ -26,20 +26,26 @@ function parseRequest(str) {
     difficulty = parseInt(arr[1], 10);
   }
   const {special, damage, action} = arr.reduce((res, element, index) => {
-    if (specCommand.includes(element) && index < 4) {
+    if (!res.actionMessageStarted && specCommand.includes(element) && index < 4) {
       res.special = true;
       return res;
     }
-    if (dmgCommand.includes(element) && index < 4) {
+    if (!res.actionMessageStarted && dmgCommand.includes(element) && index < 4) {
       res.damage = true;
       return res;
     }
     if (index > 0 && (index > 1 || index === 1 && Number.isNaN(parseInt(element, 10)))) {
       res.action = `${res.action} ${element}`.trim();
+      res.actionMessageStarted = true;
       return res;
     }
     return res;
-  }, {special: false, damage: false, action: ''});
+  }, {
+    special: false,
+    damage: false,
+    action: '',
+    actionMessageStarted: false,
+  });
   if (Number.isNaN(diceNumber)) {
     throw new Error('Wrong value for dice number!');
   }
