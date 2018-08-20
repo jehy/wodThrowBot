@@ -177,7 +177,7 @@ describe('Some simple tests', ()=>{
         const resStr = utils.resultToStr(reply);
         assert.isNotTrue(resStr.includes('damage'));
         assert.isNotTrue(resStr.includes('special'));
-        assert.isNotTrue(resStr.includes('Action: Blah-blah blah!'));
+        assert.isTrue(resStr.includes('Action: Blah-blah blah!'));
         debug(test);
         debug(resStr);
       });
@@ -196,7 +196,7 @@ describe('Some simple tests', ()=>{
         const resStr = utils.resultToStr(reply);
         assert.isNotTrue(resStr.includes('damage'));
         assert.isNotTrue(resStr.includes('special'));
-        assert.isNotTrue(resStr.includes('Action: Blah-blah blah!'));
+        assert.isTrue(resStr.includes('Action: Blah-blah blah!'));
         debug(test);
         debug(resStr);
       });
@@ -215,7 +215,24 @@ describe('Some simple tests', ()=>{
         const resStr = utils.resultToStr(reply);
         assert.isTrue(resStr.includes('damage'));
         assert.isTrue(resStr.includes('special'));
-        assert.isNotTrue(resStr.includes('Action: Blah-blah blah!'));
+        assert.isTrue(resStr.includes('Action: Blah-blah blah!'));
+        debug(test);
+        debug(resStr);
+      });
+      it('should be able to fuck goose', ()=>{
+        const test = '5 7 еби гусей';
+        const params = utils.parseRequest(test);
+        assert.equal(params.diceNumber, 5);
+        assert.equal(params.difficulty, 7);
+        assert.equal(params.damage, false);
+        assert.equal(params.special, false);
+        assert.equal(params.action, 'еби гусей');
+        const res = utils.throwDices(params);
+        const reply = utils.parseResult(res);
+        const resStr = utils.resultToStr(reply);
+        assert.isNotTrue(resStr.includes('damage'));
+        assert.isNotTrue(resStr.includes('special'));
+        assert.isTrue(resStr.includes('Action: еби гусей'));
         debug(test);
         debug(resStr);
       });

@@ -105,6 +105,7 @@ function parseResult(res) {
     values: res.values,
     task: res.task,
     message: res.options.message,
+    action: res.options.action,
   };
   if (result.success === 0 && res.one > 0 && !res.options.damage) {
     result.msg = 'Botch!';
