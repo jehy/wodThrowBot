@@ -251,6 +251,21 @@ describe('Some simple tests', ()=>{
         debug(test);
         debug(resStr);
       });
+      it('should be able to endure Rider roll (2)', ()=>{
+        const test = '5 6 damage Damage to troll';
+        const params = utils.parseRequest(test);
+        assert.equal(params.diceNumber, 5);
+        assert.equal(params.difficulty, 6);
+        assert.equal(params.damage, true);
+        assert.equal(params.special, false);
+        assert.equal(params.action, 'Damage to troll');
+        const res = utils.throwDices(params);
+        const reply = utils.parseResult(res);
+        const resStr = utils.resultToStr(reply);
+        assert.isTrue(resStr.includes('Action: Damage to troll'));
+        debug(test);
+        debug(resStr);
+      });
     });
   });
 
