@@ -18,6 +18,7 @@
   "author": "Jehy <npm@jehy.ru>",
   "license": "MIT",
   "dependencies": {
+    "config": "^2.0.1",
     "debug": "^3.1.0",
     "node-telegram-bot-api": "^0.30.0"
   },
