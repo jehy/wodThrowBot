@@ -1,8 +1,11 @@
 {
-  "name": "wodThrowBot",
-  "version": "0.0.3",
+  "name": "wodthrowbot",
+  "version": "0.0.4",
   "description": "Bot for throwing Wod dice",
   "main": "index.js",
+  "bin": {
+    "wodThrowBot": "./bin/cli.js"
+  },
   "scripts": {
     "start": "DEBUG=throwBot node --use_strict index.js",
     "lint": "./node_modules/.bin/eslint index.js",
@@ -35,5 +38,9 @@
     "mocha": "^5.2.0",
     "chai": "^4.1.2",
     "nyc": "^12.0.2"
-  }
+  },
+  "engines": {
+    "node": ">=8"
+  },
+  "engineStrict": true
 }
