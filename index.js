@@ -24,8 +24,8 @@ bot.on('webhook_error', (error) => {
 });
 
 // Matches "/echo [whatever]"
-bot.onText(/\/start/, (msg, match) => {
-  debug('start');
+bot.onText(/\/start/, (msg) => {
+  debug('start message from user');
   const chatId = msg.chat.id || msg.from.id;
   bot.sendMessage(chatId, 'Please enter message'
     + ' as "axb" where a is a number of dice and b'
@@ -39,14 +39,31 @@ bot.onText(/\/start/, (msg, match) => {
 
 const messageFromGroup = ['/roll', '/roll@WodThrowBot', '/хуйни', '/хуйни@WodThrowBot', '/кшдд', '/кшдд@WodThrowBot'];
 bot.on('message', (msg) => {
+  debug(`message from user: ${JSON.stringify(msg)}`);
   if (!msg || msg.text === '/start') {
+    debug('Empty or start message ignoring');
     return;
   }
-  const command = messageFromGroup.reduce((res, item) => res.replace(item, ''), msg.text)
-    .toLowerCase()
-    .trim();
-  debug('message');
-  debug(msg);
+
+  let command;
+  if (msg.chat.type !== 'private') // group chat
+  {
+    const isOur = messageFromGroup.some(key=>msg.text.includes(key));
+    if (!isOur)
+    {
+      debug('not for us, ignoring');
+      return;
+    }
+    command = messageFromGroup.reduce((res, item) => res.replace(item, ''), msg.text)
+      .toLowerCase()
+      .trim();
+  }
+  else // personal chat
+  {
+    command = msg.text
+      .toLowerCase()
+      .trim();
+  }
   const chatId = msg.chat.id || msg.from.id;
   let params;
   try {
