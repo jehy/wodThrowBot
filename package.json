@@ -6,10 +6,11 @@
   "scripts": {
     "start": "DEBUG=throwBot node --use_strict index.js",
     "lint": "./node_modules/.bin/eslint index.js",
-    "test": "npm run lint && nyc mocha -t 10000 --exit",
-    "test_verbose": "npm run lint && DEBUG=throwBot:test nyc mocha -t 10000 --exit",
+    "test": "npm run lint && mocha -t 10000 --exit",
+    "test_verbose": "npm run lint && DEBUG=throwBot:test mocha -t 10000 --exit",
     "check_coverage": "nyc check-coverage --lines 50 --functions 40 --branches 10",
-    "coveralls": "./node_modules/.bin/nyc report --reporter=text-lcov | ./node_modules/.bin/coveralls"
+    "coverage": "nyc npm test && npm run check_coverage",
+    "coveralls": "nyc report --reporter=text-lcov | coveralls"
   },
   "repository": {
     "type": "git",
