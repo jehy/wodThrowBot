@@ -1,10 +1,10 @@
 {
   "name": "wodthrowbot",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "Bot for throwing Wod dice",
   "main": "index.js",
   "bin": {
-    "wodthrowbot": "node ./bin/cli.js"
+    "wodthrowbot": "./bin/cli.js"
   },
   "scripts": {
     "start": "DEBUG=throwBot node --use_strict index.js",
