@@ -160,226 +160,226 @@ describe('Some simple tests', () => {
       debug(resStr);
     });
 
-    describe('counting successes', () => {
+  });
 
-      it('should count simple successes', () => {
-        const diceResult = {
-          success: 2,
-          values: [6, 7],
-          task: 'some task',
-          one: 0,
-          options: {
-            message: 'some message',
-            action: 'some action',
-          },
-        };
-        const reply = utils.parseResult(diceResult);
-        assert.deepEqual(reply, {
-          success: 2,
-          values: [6, 7],
-          task: 'some task',
-          msg: 'Success... Moderate.',
+  describe('counting successes', () => {
+
+    it('should count simple successes', () => {
+      const diceResult = {
+        success: 2,
+        values: [6, 7],
+        task: 'some task',
+        one: 0,
+        options: {
           message: 'some message',
           action: 'some action',
-        });
-      });
-
-      it('should count successes and subtract botches', () => {
-        const diceResult = {
-          success: 1,
-          values: [1, 7],
-          task: 'some task',
-          one: 1,
-          options: {
-            message: 'some message',
-            action: 'some action',
-          },
-        };
-        const reply = utils.parseResult(diceResult);
-        assert.deepEqual(reply, {
-          success: 0,
-          values: [1, 7],
-          task: 'some task',
-          message: 'some message',
-          action: 'some action',
-          msg: 'Fail!',
-        });
-      });
-
-      it('should count successes and not subtract botches in damage mode', () => {
-        const diceResult = {
-          success: 1,
-          values: [1, 7],
-          task: 'some task',
-          one: 1,
-          options: {
-            message: 'some message',
-            action: 'some action',
-            damage: true,
-          },
-        };
-        const reply = utils.parseResult(diceResult);
-        assert.deepEqual(reply, {
-          success: 1,
-          values: [1, 7],
-          task: 'some task',
-          message: 'some message',
-          action: 'some action',
-          msg: 'Success... Marginal.',
-        });
-      });
-
-      it('should count successes when using speciality', () => {
-        const diceResult = {
-          success: 2,
-          values: [5, 0],
-          task: 'some task',
-          one: 0,
-          options: {
-            message: 'some message',
-            action: 'some action',
-            damage: true,
-          },
-        };
-        const reply = utils.parseResult(diceResult);
-        assert.deepEqual(reply, {
-          success: 2,
-          values: [5, 0],
-          task: 'some task',
-          message: 'some message',
-          action: 'some action',
-          msg: 'Success... Moderate.',
-        });
-      });
-
-      it('should count successes when using speciality and damage mode', () => {
-        const diceResult = {
-          success: 1,
-          values: [5, 0, 1],
-          task: 'some task',
-          one: 1,
-          options: {
-            message: 'some message',
-            action: 'some action',
-            damage: true,
-          },
-        };
-        const reply = utils.parseResult(diceResult);
-        assert.deepEqual(reply, {
-          success: 1,
-          values: [5, 0, 1],
-          task: 'some task',
-          message: 'some message',
-          action: 'some action',
-          msg: 'Success... Marginal.',
-        });
+        },
+      };
+      const reply = utils.parseResult(diceResult);
+      assert.deepEqual(reply, {
+        success: 2,
+        values: [6, 7],
+        task: 'some task',
+        msg: 'Success... Moderate.',
+        message: 'some message',
+        action: 'some action',
       });
     });
-    describe('passing message', () => {
 
-      it('should be able to pass message (no flags, no difficulty)', () => {
-        const test = '5 Blah-blah blah!';
-        const params = utils.parseRequest(test);
-        assert.equal(params.diceNumber, 5);
-        assert.equal(params.difficulty, 6);
-        assert.equal(params.damage, false);
-        assert.equal(params.special, false);
-        assert.equal(params.action, 'Blah-blah blah!');
-        const res = utils.throwDices(params);
-        const reply = utils.parseResult(res);
-        const resStr = utils.resultToStr(reply);
-        assert.isNotTrue(resStr.includes('damage'));
-        assert.isNotTrue(resStr.includes('special'));
-        assert.isTrue(resStr.includes('Action: Blah-blah blah!'));
-        debug(test);
-        debug(resStr);
+    it('should count successes and subtract botches', () => {
+      const diceResult = {
+        success: 1,
+        values: [1, 7],
+        task: 'some task',
+        one: 1,
+        options: {
+          message: 'some message',
+          action: 'some action',
+        },
+      };
+      const reply = utils.parseResult(diceResult);
+      assert.deepEqual(reply, {
+        success: 0,
+        values: [1, 7],
+        task: 'some task',
+        message: 'some message',
+        action: 'some action',
+        msg: 'Fail!',
       });
+    });
 
+    it('should count successes and not subtract botches in damage mode', () => {
+      const diceResult = {
+        success: 1,
+        values: [1, 7],
+        task: 'some task',
+        one: 1,
+        options: {
+          message: 'some message',
+          action: 'some action',
+          damage: true,
+        },
+      };
+      const reply = utils.parseResult(diceResult);
+      assert.deepEqual(reply, {
+        success: 1,
+        values: [1, 7],
+        task: 'some task',
+        message: 'some message',
+        action: 'some action',
+        msg: 'Success... Marginal.',
+      });
+    });
 
-      it('should be able to pass message (no flags, difficulty)', () => {
-        const test = '5 8 Blah-blah blah!';
-        const params = utils.parseRequest(test);
-        assert.equal(params.diceNumber, 5);
-        assert.equal(params.difficulty, 8);
-        assert.equal(params.damage, false);
-        assert.equal(params.special, false);
-        assert.equal(params.action, 'Blah-blah blah!');
-        const res = utils.throwDices(params);
-        const reply = utils.parseResult(res);
-        const resStr = utils.resultToStr(reply);
-        assert.isNotTrue(resStr.includes('damage'));
-        assert.isNotTrue(resStr.includes('special'));
-        assert.isTrue(resStr.includes('Action: Blah-blah blah!'));
-        debug(test);
-        debug(resStr);
+    it('should count successes when using speciality', () => {
+      const diceResult = {
+        success: 2,
+        values: [5, 0],
+        task: 'some task',
+        one: 0,
+        options: {
+          message: 'some message',
+          action: 'some action',
+          damage: true,
+        },
+      };
+      const reply = utils.parseResult(diceResult);
+      assert.deepEqual(reply, {
+        success: 2,
+        values: [5, 0],
+        task: 'some task',
+        message: 'some message',
+        action: 'some action',
+        msg: 'Success... Moderate.',
       });
+    });
 
-
-      it('should be able to pass (all flags)', () => {
-        const test = '5 8 spec damage Blah-blah blah!';
-        const params = utils.parseRequest(test);
-        assert.equal(params.diceNumber, 5);
-        assert.equal(params.difficulty, 8);
-        assert.equal(params.damage, true);
-        assert.equal(params.special, true);
-        assert.equal(params.action, 'Blah-blah blah!');
-        const res = utils.throwDices(params);
-        const reply = utils.parseResult(res);
-        const resStr = utils.resultToStr(reply);
-        assert.isTrue(resStr.includes('damage'));
-        assert.isTrue(resStr.includes('special'));
-        assert.isTrue(resStr.includes('Action: Blah-blah blah!'));
-        debug(test);
-        debug(resStr);
-      });
-      it('should be able to fuck goose', () => {
-        const test = '5 7 еби гусей';
-        const params = utils.parseRequest(test);
-        assert.equal(params.diceNumber, 5);
-        assert.equal(params.difficulty, 7);
-        assert.equal(params.damage, false);
-        assert.equal(params.special, false);
-        assert.equal(params.action, 'еби гусей');
-        const res = utils.throwDices(params);
-        const reply = utils.parseResult(res);
-        const resStr = utils.resultToStr(reply);
-        assert.isNotTrue(resStr.includes('damage'));
-        assert.isNotTrue(resStr.includes('special'));
-        assert.isTrue(resStr.includes('Action: еби гусей'));
-        debug(test);
-        debug(resStr);
-      });
-      it('should be able to endure Rider roll', () => {
-        const test = '6 7 No damage intended!';
-        const params = utils.parseRequest(test);
-        assert.equal(params.diceNumber, 6);
-        assert.equal(params.difficulty, 7);
-        assert.equal(params.damage, false);
-        assert.equal(params.special, false);
-        assert.equal(params.action, 'No damage intended!');
-        const res = utils.throwDices(params);
-        const reply = utils.parseResult(res);
-        const resStr = utils.resultToStr(reply);
-        assert.isTrue(resStr.includes('Action: No damage intended!'));
-        debug(test);
-        debug(resStr);
-      });
-      it('should be able to endure Rider roll (2)', () => {
-        const test = '5 6 damage Damage to troll';
-        const params = utils.parseRequest(test);
-        assert.equal(params.diceNumber, 5);
-        assert.equal(params.difficulty, 6);
-        assert.equal(params.damage, true);
-        assert.equal(params.special, false);
-        assert.equal(params.action, 'Damage to troll');
-        const res = utils.throwDices(params);
-        const reply = utils.parseResult(res);
-        const resStr = utils.resultToStr(reply);
-        assert.isTrue(resStr.includes('Action: Damage to troll'));
-        debug(test);
-        debug(resStr);
+    it('should count successes when using speciality and damage mode', () => {
+      const diceResult = {
+        success: 1,
+        values: [5, 0, 1],
+        task: 'some task',
+        one: 1,
+        options: {
+          message: 'some message',
+          action: 'some action',
+          damage: true,
+        },
+      };
+      const reply = utils.parseResult(diceResult);
+      assert.deepEqual(reply, {
+        success: 1,
+        values: [5, 0, 1],
+        task: 'some task',
+        message: 'some message',
+        action: 'some action',
+        msg: 'Success... Marginal.',
       });
     });
   });
+  describe('passing message', () => {
 
+    it('should be able to pass message (no flags, no difficulty)', () => {
+      const test = '5 Blah-blah blah!';
+      const params = utils.parseRequest(test);
+      assert.equal(params.diceNumber, 5);
+      assert.equal(params.difficulty, 6);
+      assert.equal(params.damage, false);
+      assert.equal(params.special, false);
+      assert.equal(params.action, 'Blah-blah blah!');
+      const res = utils.throwDices(params);
+      const reply = utils.parseResult(res);
+      const resStr = utils.resultToStr(reply);
+      assert.isNotTrue(resStr.includes('damage'));
+      assert.isNotTrue(resStr.includes('special'));
+      assert.isTrue(resStr.includes('Action: Blah-blah blah!'));
+      debug(test);
+      debug(resStr);
+    });
+
+
+    it('should be able to pass message (no flags, difficulty)', () => {
+      const test = '5 8 Blah-blah blah!';
+      const params = utils.parseRequest(test);
+      assert.equal(params.diceNumber, 5);
+      assert.equal(params.difficulty, 8);
+      assert.equal(params.damage, false);
+      assert.equal(params.special, false);
+      assert.equal(params.action, 'Blah-blah blah!');
+      const res = utils.throwDices(params);
+      const reply = utils.parseResult(res);
+      const resStr = utils.resultToStr(reply);
+      assert.isNotTrue(resStr.includes('damage'));
+      assert.isNotTrue(resStr.includes('special'));
+      assert.isTrue(resStr.includes('Action: Blah-blah blah!'));
+      debug(test);
+      debug(resStr);
+    });
+
+
+    it('should be able to pass (all flags)', () => {
+      const test = '5 8 spec damage Blah-blah blah!';
+      const params = utils.parseRequest(test);
+      assert.equal(params.diceNumber, 5);
+      assert.equal(params.difficulty, 8);
+      assert.equal(params.damage, true);
+      assert.equal(params.special, true);
+      assert.equal(params.action, 'Blah-blah blah!');
+      const res = utils.throwDices(params);
+      const reply = utils.parseResult(res);
+      const resStr = utils.resultToStr(reply);
+      assert.isTrue(resStr.includes('damage'));
+      assert.isTrue(resStr.includes('special'));
+      assert.isTrue(resStr.includes('Action: Blah-blah blah!'));
+      debug(test);
+      debug(resStr);
+    });
+    it('should be able to fuck goose', () => {
+      const test = '5 7 еби гусей';
+      const params = utils.parseRequest(test);
+      assert.equal(params.diceNumber, 5);
+      assert.equal(params.difficulty, 7);
+      assert.equal(params.damage, false);
+      assert.equal(params.special, false);
+      assert.equal(params.action, 'еби гусей');
+      const res = utils.throwDices(params);
+      const reply = utils.parseResult(res);
+      const resStr = utils.resultToStr(reply);
+      assert.isNotTrue(resStr.includes('damage'));
+      assert.isNotTrue(resStr.includes('special'));
+      assert.isTrue(resStr.includes('Action: еби гусей'));
+      debug(test);
+      debug(resStr);
+    });
+    it('should be able to endure Rider roll', () => {
+      const test = '6 7 No damage intended!';
+      const params = utils.parseRequest(test);
+      assert.equal(params.diceNumber, 6);
+      assert.equal(params.difficulty, 7);
+      assert.equal(params.damage, false);
+      assert.equal(params.special, false);
+      assert.equal(params.action, 'No damage intended!');
+      const res = utils.throwDices(params);
+      const reply = utils.parseResult(res);
+      const resStr = utils.resultToStr(reply);
+      assert.isTrue(resStr.includes('Action: No damage intended!'));
+      debug(test);
+      debug(resStr);
+    });
+    it('should be able to endure Rider roll (2)', () => {
+      const test = '5 6 damage Damage to troll';
+      const params = utils.parseRequest(test);
+      assert.equal(params.diceNumber, 5);
+      assert.equal(params.difficulty, 6);
+      assert.equal(params.damage, true);
+      assert.equal(params.special, false);
+      assert.equal(params.action, 'Damage to troll');
+      const res = utils.throwDices(params);
+      const reply = utils.parseResult(res);
+      const resStr = utils.resultToStr(reply);
+      assert.isTrue(resStr.includes('Action: Damage to troll'));
+      debug(test);
+      debug(resStr);
+    });
+  });
 });
