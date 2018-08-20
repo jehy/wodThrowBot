@@ -123,7 +123,7 @@ function parseResult(res) {
 }
 
 function resultToStr(res) {
-  const action = res.action && (`Action: ${res.action}\n`);
+  const action = res.action && (`Action: ${res.action}\n`) || '';
   return `Task: ${res.task}\n${action}Result: ${res.values.join(', ')}\nSuccesses: ${res.success}\nMessage: ${res.msg}`;
 }
 

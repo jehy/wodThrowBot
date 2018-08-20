@@ -4,7 +4,7 @@
   "description": "Bot for throwing Wod dice",
   "main": "index.js",
   "scripts": {
-    "start": "node --use_strict index.js",
+    "start": "DEBUG=throwBot node --use_strict index.js",
     "lint": "./node_modules/.bin/eslint index.js",
     "test": "npm run lint && nyc mocha -t 10000 --exit",
     "test_verbose": "npm run lint && DEBUG=throwBot:test nyc mocha -t 10000 --exit",
