@@ -20,3 +20,11 @@ Where
 * `spec` if you are using speciality (10 counts as 2x successes)
 * `damage` if you're gonna roll damage (1 does not subtract successes)
 * `action` description of what you're doing
+
+## For geeks
+
+You can also use this package via cli, like
+
+```bash
+npx wodthrowbot 5 8 s d rolling stones
+```
