@@ -1,6 +1,6 @@
 {
   "name": "wodthrowbot",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "Bot for throwing Wod dice",
   "main": "index.js",
   "bin": {

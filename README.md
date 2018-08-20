@@ -9,7 +9,7 @@ Simple bor for throwing dices in VTM mechanics.
 
 You can find it on telegram as `@WodThrowBot`.
 
-Syntax:
+**Syntax:**
 ```
 /roll numberDice [difficulty] [spec] [damage] [action]
 ```
@@ -21,6 +21,11 @@ Where
 * `damage` if you're gonna roll damage (1 does not subtract successes)
 * `action` description of what you're doing
 
+**Examples**
+* `/roll 5` - roll 5 dices with base difficulty 6
+* `/roll 5 8` - roll 5 dices with difficulty 8
+* `/roll 5 8 spec damage` or `/roll 5 8 s d` - roll 5 dices with difficulty 8 using speciality and damage option
+* `/roll 5 8 s d mighty action` - same as above with comment "mighty action"
 ## For geeks
 
 You can also use this package via cli, like
