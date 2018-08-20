@@ -1,11 +1,11 @@
 'use strict';
 
-const  TelegramBot = require('node-telegram-bot-api');
+const TelegramBot = require('node-telegram-bot-api');
+const config = require('config');
 const debug = require('debug')('throwBot');
 
 
 const utils = require('./utils');
-const  config = require('./config/config.json');
 
 // replace the value below with the Telegram token you receive from @BotFather
 const {token} = config.telegram;
@@ -34,17 +34,14 @@ bot.onText(/\/start/, (msg, match) => {
 
 // Listen for any kind of message. There are different kinds of
 // messages.
+
+
+const messageFromGroup = ['/roll', '/roll@WodThrowBot', '/хуйни', '/хуйни@WodThrowBot', '/кшдд', '/кшдд@WodThrowBot'];
 bot.on('message', (msg) => {
   if (!msg || msg.text === '/start') {
     return;
   }
-  msg.text = msg.text
-    .replace('/roll', '')
-    .replace('/roll@WodThrowBot', '')
-    .replace('/хуйни', '')
-    .replace('/хуйни@WodThrowBot', '')
-    .replace('/кшдд', '')
-    .replace('/кшдд@WodThrowBot', '')
+  const command = messageFromGroup.reduce((res, item) => res.replace(item, ''), msg.text)
     .toLowerCase()
     .trim();
   debug('message');
@@ -52,7 +49,7 @@ bot.on('message', (msg) => {
   const chatId = msg.chat.id || msg.from.id;
   let params;
   try {
-    params = utils.parseRequest(msg.text);
+    params = utils.parseRequest(command);
   }
   catch (e) {
     bot.sendMessage(chatId, e.toString());

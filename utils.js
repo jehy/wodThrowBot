@@ -10,34 +10,36 @@ function randomDice() {
 
 const specCommand = ['spec', 's', 'ы'];
 const dmgCommand = ['dmg', 'd', 'damage', 'в'];
-const messageCommand = ['message', 'm', 'ь'];
 
 function parseRequest(str) {
   let difficulty = 6;
-  let special = false;
-  let damage = false;
-  let message = '';
-  const arr = str.trim().split(' ').map(el=>el.trim());
+  // support for old syntax with x, both russian and english
+  if (str[0] === 'x' || str[1] === 'x') { // eng
+    str = str.replace('x', ' ');
+  }
+  if (str[0] === 'х' || str[1] === 'х') { // rus
+    str = str.replace('х', ' ');
+  }
+  const arr = str.trim().split(' ').map(el => el.trim());
   const diceNumber = parseInt(arr[0], 10);
-  if (!Number.isNaN(parseInt(arr[1], 10)))
-  {
+  if (!Number.isNaN(parseInt(arr[1], 10))) {
     difficulty = parseInt(arr[1], 10);
   }
-  arr.every((element, index, array) => {
-    if (specCommand.indexOf(element) > -1) {
-      special = true;
-      return true;
+  const {special, damage, action} = arr.reduce((res, element, index) => {
+    if (specCommand.includes(element) && index < 4) {
+      res.special = true;
+      return res;
     }
-    if (dmgCommand.indexOf(element) > -1) {
-      damage = true;
-      return true;
+    if (dmgCommand.includes(element) && index < 4) {
+      res.damage = true;
+      return res;
     }
-    if (messageCommand.indexOf(element) > -1) {
-      message = array.slice(index + 1).join(' ');
-      return false;
+    if (index > 0 && (index > 1 || index === 1 && Number.isNaN(parseInt(element, 10)))) {
+      res.action = `${res.action} ${element}`.trim();
+      return res;
     }
-    return true;
-  });
+    return res;
+  }, {special: false, damage: false, action: ''});
   if (Number.isNaN(diceNumber)) {
     throw new Error('Wrong value for dice number!');
   }
@@ -48,13 +50,13 @@ function parseRequest(str) {
     throw new Error('You don`t like easy task, yeah?');
   }
   return {
-    difficulty, diceNumber, special, damage, message,
+    difficulty, diceNumber, special, damage, action,
   };
 }
 
 function throwDices(options) {
   const {
-    difficulty, diceNumber, special, damage, message,
+    difficulty, diceNumber, special, damage,
   } = options;
   const res = {
     values: [],
@@ -88,34 +90,41 @@ function throwDices(options) {
   return res;
 }
 
+const messages = [
+  'Fail!',
+  'Success... Marginal.',
+  'Success... Moderate.',
+  'Success. Complete!',
+  'Success. Exceptional!!',
+  'Success!!! Phenomenal!!!',
+];
+
 function parseResult(res) {
-  const result = {success: res.success, values: res.values, task: res.task, message: res.options.message};
+  const result = {
+    success: res.success,
+    values: res.values,
+    task: res.task,
+    message: res.options.message,
+  };
   if (result.success === 0 && res.one > 0 && !res.options.damage) {
     result.msg = 'Botch!';
     return result;
   }
-  if (!res.options.damage)
-  {
+  if (!res.options.damage) {
     result.success = Math.max(result.success - res.one, 0);
   }
-  switch (result.success) {
-    case 0: result.msg = 'Fail!';
-      break;
-    case 1: result.msg = 'Success... Marginal.';
-      break;
-    case 2: result.msg = 'Success... Moderate.';
-      break;
-    case 3: result.msg = 'Success. Complete!';
-      break;
-    case 4: result.msg = 'Success. Exceptional!!';
-      break;
-    default: result.msg = 'Success!!! Phenomenal!!!';
+  if (result.success >= 5) {
+    result.msg = messages[5];
+  }
+  else {
+    result.msg = messages[result.success];
   }
   return result;
 }
 
 function resultToStr(res) {
-  return `Task: ${res.task}\n${res.message}\nResult: ${res.values.join(', ')}\nSuccesses: ${res.success}\nMessage: ${res.msg}`;
+  const action = res.action && (`Action: ${res.action}\n`);
+  return `Task: ${res.task}\n${action}Result: ${res.values.join(', ')}\nSuccesses: ${res.success}\nMessage: ${res.msg}`;
 }
 
 module.exports = {

@@ -28,6 +28,7 @@
         ]
       }
     ],
+    "prefer-destructuring": "warn",
     "one-var": "off",
     "no-mixed-operators": "off",
     "arrow-body-style": "off",
