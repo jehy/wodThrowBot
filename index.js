@@ -58,7 +58,7 @@ bot.on('message', (msg) => {
   }
   const res = utils.throwDices(params);
   const reply = utils.parseResult(res);
-  const resStr = utils.resultToStr(reply);
+  const resStr = utils.resultToStr(reply, msg.from.username);
   Promise.delay(200)
     .then(() => bot.sendChatAction(chatId, 'typing'))
     .then(() => Promise.delay(2000))

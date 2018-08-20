@@ -123,9 +123,10 @@ function parseResult(res) {
   return result;
 }
 
-function resultToStr(res) {
+function resultToStr(res, userName) {
   const action = res.action && (`Action: ${res.action}\n`) || '';
-  return `Task: ${res.task}\n${action}Result: ${res.values.join(', ')}\nSuccesses: ${res.success}\nMessage: ${res.msg}`;
+  const userNameStr = userName && (`User: @${userName}\n`) || '';
+  return `${userNameStr}Task: ${res.task}\n${action}Result: ${res.values.join(', ')}\nSuccesses: ${res.success}\nMessage: ${res.msg}`;
 }
 
 module.exports = {
