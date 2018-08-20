@@ -105,6 +105,7 @@ function parseResult(res) {
     values: res.values,
     task: res.task,
     message: res.options.message,
+    action: res.options.action,
   };
   if (result.success === 0 && res.one > 0 && !res.options.damage) {
     result.msg = 'Botch!';
@@ -122,9 +123,10 @@ function parseResult(res) {
   return result;
 }
 
-function resultToStr(res) {
-  const action = res.action && (`Action: ${res.action}\n`);
-  return `Task: ${res.task}\n${action}Result: ${res.values.join(', ')}\nSuccesses: ${res.success}\nMessage: ${res.msg}`;
+function resultToStr(res, userName) {
+  const action = res.action && (`Action: ${res.action}\n`) || '';
+  const userNameStr = userName && (`User: @${userName}\n`) || '';
+  return `${userNameStr}Task: ${res.task}\n${action}Result: ${res.values.join(', ')}\nSuccesses: ${res.success}\nMessage: ${res.msg}`;
 }
 
 module.exports = {

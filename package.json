@@ -4,7 +4,7 @@
   "description": "Bot for throwing Wod dice",
   "main": "index.js",
   "scripts": {
-    "start": "node --use_strict index.js",
+    "start": "DEBUG=throwBot node --use_strict index.js",
     "lint": "./node_modules/.bin/eslint index.js",
     "test": "npm run lint && nyc mocha -t 10000 --exit",
     "test_verbose": "npm run lint && DEBUG=throwBot:test nyc mocha -t 10000 --exit",
@@ -18,13 +18,14 @@
   "author": "Jehy <npm@jehy.ru>",
   "license": "MIT",
   "dependencies": {
+    "bluebird": "^3.5.1",
     "config": "^2.0.1",
     "debug": "^3.1.0",
     "node-telegram-bot-api": "^0.30.0"
   },
   "devDependencies": {
     "coveralls": "^3.0.2",
-    "eslint": "^5.3.0",
+    "eslint": "^5.4.0",
     "eslint-config-airbnb-base": "^13.1.0",
     "eslint-loader": "^2.1.0",
     "eslint-plugin-import": "^2.14.0",

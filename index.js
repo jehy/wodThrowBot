@@ -3,6 +3,7 @@
 const TelegramBot = require('node-telegram-bot-api');
 const config = require('config');
 const debug = require('debug')('throwBot');
+const Promise = require('bluebird');
 
 
 const utils = require('./utils');
@@ -57,7 +58,9 @@ bot.on('message', (msg) => {
   }
   const res = utils.throwDices(params);
   const reply = utils.parseResult(res);
-  const resStr = utils.resultToStr(reply);
-  // send a message to the chat acknowledging receipt of their message
-  bot.sendMessage(chatId, resStr);
+  const resStr = utils.resultToStr(reply, msg.from.username);
+  Promise.delay(200)
+    .then(() => bot.sendChatAction(chatId, 'typing'))
+    .then(() => Promise.delay(2000))
+    .then(() => bot.sendMessage(chatId, resStr));
 });
