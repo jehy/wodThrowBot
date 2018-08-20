@@ -5,20 +5,18 @@ const assert = require('chai').assert;
 
 const utils = require('../utils');
 
-describe('Some simple tests', ()=>{
+describe('Some simple tests', () => {
 
-  it('should be able to throw a hundred dice', ()=>{
+  it('should be able to throw a hundred dice', () => {
 
-    for (let i = 0; i < 100; i++)
-    {
+    for (let i = 0; i < 100; i++) {
       utils.randomDice();
     }
   });
 
-  it('should be able to process some inputs', ()=>{
+  it('should be able to process some inputs', () => {
 
-    for (let i = 0; i < 100; i++)
-    {
+    for (let i = 0; i < 100; i++) {
       const test = '5x8';
       const params = utils.parseRequest(test);
       const res = utils.throwDices(params);
@@ -28,8 +26,8 @@ describe('Some simple tests', ()=>{
   });
 
 
-  describe('Parsing request', ()=>{
-    it('should be able to process russian input', ()=>{
+  describe('Parsing request', () => {
+    it('should be able to process russian input', () => {
       const test = '5х8';
       const params = utils.parseRequest(test);
       assert.equal(params.diceNumber, 5);
@@ -47,7 +45,7 @@ describe('Some simple tests', ()=>{
       debug(resStr);
     });
 
-    it('should be able to process english input', ()=>{
+    it('should be able to process english input', () => {
       const test = '5x8';
       const params = utils.parseRequest(test);
       assert.equal(params.diceNumber, 5);
@@ -65,7 +63,7 @@ describe('Some simple tests', ()=>{
       debug(resStr);
     });
 
-    it('should be able to process input without "x"', ()=>{
+    it('should be able to process input without "x"', () => {
       const test = '5 8';
       const params = utils.parseRequest(test);
       assert.equal(params.diceNumber, 5);
@@ -84,7 +82,7 @@ describe('Some simple tests', ()=>{
     });
 
 
-    it('should be able to process speciality throws', ()=>{
+    it('should be able to process speciality throws', () => {
       const test = '5 8 spec';
       const test2 = '5 8 s';
       const test3 = '5 8 ы';
@@ -108,7 +106,7 @@ describe('Some simple tests', ()=>{
       debug(resStr);
     });
 
-    it('should be able to process damage throws', ()=>{
+    it('should be able to process damage throws', () => {
       const test = '5 8 damage';
       const test2 = '5 8 dmg';
       const test3 = '5 8 d';
@@ -135,7 +133,7 @@ describe('Some simple tests', ()=>{
       debug(resStr);
     });
 
-    it('should be able to process both speciality and damage throws', ()=>{
+    it('should be able to process both speciality and damage throws', () => {
       const test = '5 8 damage spec';
       const test2 = '5 8 spec dmg';
       const test3 = '5 8 d s';
@@ -162,9 +160,124 @@ describe('Some simple tests', ()=>{
       debug(resStr);
     });
 
-    describe('passing message', ()=>{
+    describe('counting successes', () => {
 
-      it('should be able to pass message (no flags, no difficulty)', ()=>{
+      it('should count simple successes', () => {
+        const diceResult = {
+          success: 2,
+          values: [6, 7],
+          task: 'some task',
+          one: 0,
+          options: {
+            message: 'some message',
+            action: 'some action',
+          },
+        };
+        const reply = utils.parseResult(diceResult);
+        assert.deepEqual(reply, {
+          success: 2,
+          values: [6, 7],
+          task: 'some task',
+          msg: 'Success... Moderate.',
+          message: 'some message',
+          action: 'some action',
+        });
+      });
+
+      it('should count successes and subtract botches', () => {
+        const diceResult = {
+          success: 1,
+          values: [1, 7],
+          task: 'some task',
+          one: 1,
+          options: {
+            message: 'some message',
+            action: 'some action',
+          },
+        };
+        const reply = utils.parseResult(diceResult);
+        assert.deepEqual(reply, {
+          success: 0,
+          values: [1, 7],
+          task: 'some task',
+          message: 'some message',
+          action: 'some action',
+          msg: 'Fail!',
+        });
+      });
+
+      it('should count successes and not subtract botches in damage mode', () => {
+        const diceResult = {
+          success: 1,
+          values: [1, 7],
+          task: 'some task',
+          one: 1,
+          options: {
+            message: 'some message',
+            action: 'some action',
+            damage: true,
+          },
+        };
+        const reply = utils.parseResult(diceResult);
+        assert.deepEqual(reply, {
+          success: 1,
+          values: [1, 7],
+          task: 'some task',
+          message: 'some message',
+          action: 'some action',
+          msg: 'Success... Marginal.',
+        });
+      });
+
+      it('should count successes when using speciality', () => {
+        const diceResult = {
+          success: 2,
+          values: [5, 0],
+          task: 'some task',
+          one: 0,
+          options: {
+            message: 'some message',
+            action: 'some action',
+            damage: true,
+          },
+        };
+        const reply = utils.parseResult(diceResult);
+        assert.deepEqual(reply, {
+          success: 2,
+          values: [5, 0],
+          task: 'some task',
+          message: 'some message',
+          action: 'some action',
+          msg: 'Success... Moderate.',
+        });
+      });
+
+      it('should count successes when using speciality and damage mode', () => {
+        const diceResult = {
+          success: 1,
+          values: [5, 0, 1],
+          task: 'some task',
+          one: 1,
+          options: {
+            message: 'some message',
+            action: 'some action',
+            damage: true,
+          },
+        };
+        const reply = utils.parseResult(diceResult);
+        assert.deepEqual(reply, {
+          success: 1,
+          values: [5, 0, 1],
+          task: 'some task',
+          message: 'some message',
+          action: 'some action',
+          msg: 'Success... Marginal.',
+        });
+      });
+    });
+    describe('passing message', () => {
+
+      it('should be able to pass message (no flags, no difficulty)', () => {
         const test = '5 Blah-blah blah!';
         const params = utils.parseRequest(test);
         assert.equal(params.diceNumber, 5);
@@ -183,7 +296,7 @@ describe('Some simple tests', ()=>{
       });
 
 
-      it('should be able to pass message (no flags, difficulty)', ()=>{
+      it('should be able to pass message (no flags, difficulty)', () => {
         const test = '5 8 Blah-blah blah!';
         const params = utils.parseRequest(test);
         assert.equal(params.diceNumber, 5);
@@ -202,7 +315,7 @@ describe('Some simple tests', ()=>{
       });
 
 
-      it('should be able to pass (all flags)', ()=>{
+      it('should be able to pass (all flags)', () => {
         const test = '5 8 spec damage Blah-blah blah!';
         const params = utils.parseRequest(test);
         assert.equal(params.diceNumber, 5);
@@ -219,7 +332,7 @@ describe('Some simple tests', ()=>{
         debug(test);
         debug(resStr);
       });
-      it('should be able to fuck goose', ()=>{
+      it('should be able to fuck goose', () => {
         const test = '5 7 еби гусей';
         const params = utils.parseRequest(test);
         assert.equal(params.diceNumber, 5);
@@ -236,7 +349,7 @@ describe('Some simple tests', ()=>{
         debug(test);
         debug(resStr);
       });
-      it('should be able to endure Rider roll', ()=>{
+      it('should be able to endure Rider roll', () => {
         const test = '6 7 No damage intended!';
         const params = utils.parseRequest(test);
         assert.equal(params.diceNumber, 6);
@@ -251,7 +364,7 @@ describe('Some simple tests', ()=>{
         debug(test);
         debug(resStr);
       });
-      it('should be able to endure Rider roll (2)', ()=>{
+      it('should be able to endure Rider roll (2)', () => {
         const test = '5 6 damage Damage to troll';
         const params = utils.parseRequest(test);
         assert.equal(params.diceNumber, 5);
