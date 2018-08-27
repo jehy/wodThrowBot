@@ -60,7 +60,7 @@ bot.on('message', (msg) => {
   }
   else // personal chat
   {
-    command = msg.text
+    command = messageFromGroup.reduce((res, item) => res.replace(item, ''), msg.text)
       .toLowerCase()
       .trim();
   }
