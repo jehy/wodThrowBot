@@ -1,6 +1,6 @@
 {
   "name": "wodthrowbot",
-  "version": "0.0.11",
+  "version": "0.0.12",
   "description": "Bot for throwing Wod dice",
   "main": "index.js",
   "bin": {
@@ -8,7 +8,7 @@
   },
   "scripts": {
     "start": "DEBUG=throwBot node --use_strict index.js",
-    "lint": "./node_modules/.bin/eslint index.js",
+    "lint": "./node_modules/.bin/eslint index.js utils.js test bin",
     "test": "npm run lint && mocha -t 10000 --exit",
     "test_verbose": "npm run lint && DEBUG=throwBot:test mocha -t 10000 --exit",
     "check_coverage": "nyc check-coverage --lines 80 --functions 80 --branches 80",
@@ -22,22 +22,22 @@
   "author": "Jehy <npm@jehy.ru>",
   "license": "MIT",
   "dependencies": {
-    "bluebird": "^3.5.1",
+    "bluebird": "^3.5.2",
     "config": "^2.0.1",
-    "debug": "^3.1.0",
+    "debug": "^4.0.1",
     "node-telegram-bot-api": "^0.30.0"
   },
   "devDependencies": {
     "coveralls": "^3.0.2",
-    "eslint": "^5.4.0",
+    "eslint": "^5.5.0",
     "eslint-config-airbnb-base": "^13.1.0",
     "eslint-loader": "^2.1.0",
     "eslint-plugin-import": "^2.14.0",
-    "eslint-plugin-promise": "^4.0.0",
-    "eslint-plugin-standard": "^3.1.0",
+    "eslint-plugin-promise": "^4.0.1",
+    "eslint-plugin-standard": "^4.0.0",
     "mocha": "^5.2.0",
     "chai": "^4.1.2",
-    "nyc": "^12.0.2"
+    "nyc": "^13.0.1"
   },
   "engines": {
     "node": ">=8"
