@@ -15,12 +15,12 @@ const {token} = config.telegram;
 const bot = new TelegramBot(token, {polling: true});
 
 bot.on('polling_error', (error) => {
-  debug(`Polling error: ${error.code}`);  // => 'EFATAL'
+  debug('Polling error', error);  // => 'EFATAL'
   debug(error);
 });
 
 bot.on('webhook_error', (error) => {
-  debug(`Webhook error: ${error.code}`);  // => 'EPARSE'
+  debug('Webhook error', error);  // => 'EPARSE'
 });
 
 // Matches "/echo [whatever]"
@@ -48,7 +48,7 @@ bot.on('message', (msg) => {
   let command;
   if (msg.chat.type !== 'private') // group chat
   {
-    const isOur = messageFromGroup.some(key=>msg.text.includes(key));
+    const isOur = messageFromGroup.some(key=>msg.text && msg.text.includes(key));
     if (!isOur)
     {
       debug('not for us, ignoring');

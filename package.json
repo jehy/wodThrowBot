@@ -1,6 +1,6 @@
 {
   "name": "wodthrowbot",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "description": "Bot for throwing Wod dice",
   "main": "index.js",
   "bin": {
@@ -22,25 +22,36 @@
   "author": "Jehy <npm@jehy.ru>",
   "license": "MIT",
   "dependencies": {
-    "bluebird": "^3.5.3",
-    "config": "^3.0.1",
+    "bluebird": "^3.5.4",
+    "config": "^3.1.0",
     "debug": "^4.1.1",
     "node-telegram-bot-api": "^0.30.0"
   },
   "devDependencies": {
+    "chai": "^4.2.0",
     "coveralls": "^3.0.3",
-    "eslint": "^5.14.1",
+    "eslint": "^5.16.0",
     "eslint-config-airbnb-base": "^13.1.0",
     "eslint-loader": "^2.1.2",
-    "eslint-plugin-import": "^2.16.0",
-    "eslint-plugin-promise": "^4.0.1",
+    "eslint-plugin-import": "^2.17.2",
+    "eslint-plugin-promise": "^4.1.1",
     "eslint-plugin-standard": "^4.0.0",
-    "mocha": "^6.0.2",
-    "chai": "^4.2.0",
-    "nyc": "^13.3.0"
+    "husky": "^2.2.0",
+    "lint-staged": "^8.1.6",
+    "mocha": "^6.1.4",
+    "nyc": "^14.1.0"
   },
   "engines": {
     "node": ">=8"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged",
+      "pre-push": "npm test"
+    }
+  },
+  "lint-staged": {
+    "*.js": "eslint"
   },
   "engineStrict": true
 }
