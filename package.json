@@ -13,7 +13,9 @@
     "test_verbose": "npm run lint && DEBUG=throwBot:test mocha -t 10000 --exit",
     "check_coverage": "nyc check-coverage --lines 80 --functions 80 --branches 80",
     "coverage": "nyc npm test && npm run check_coverage",
-    "coveralls": "nyc report --reporter=text-lcov | coveralls"
+    "coveralls": "nyc report --reporter=text-lcov | coveralls",
+    "snyk-protect": "snyk protect",
+    "prepare": "npm run snyk-protect"
   },
   "repository": {
     "type": "git",
@@ -25,7 +27,8 @@
     "bluebird": "^3.5.4",
     "config": "^3.1.0",
     "debug": "^4.1.1",
-    "node-telegram-bot-api": "^0.30.0"
+    "node-telegram-bot-api": "^0.30.0",
+    "snyk": "^1.316.1"
   },
   "devDependencies": {
     "chai": "^4.2.0",
@@ -53,5 +56,6 @@
   "lint-staged": {
     "*.js": "eslint"
   },
-  "engineStrict": true
+  "engineStrict": true,
+  "snyk": true
 }
