@@ -1,0 +1,9 @@
+{
+  "apps": [
+    {
+      "name": "wodThrowBot",
+      "script": "npm",
+      "args": "start"
+    }
+  ]
+}

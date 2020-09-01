@@ -1,163 +1,83 @@
-const crypto = require('crypto'),
-  TelegramBot = require('node-telegram-bot-api'),
-  config = require('./config/config.json');
+'use strict';
+
+const TelegramBot = require('node-telegram-bot-api');
+const config = require('config');
+const debug = require('debug')('throwBot');
+const Promise = require('bluebird');
+
+
+const utils = require('./utils');
 
 // replace the value below with the Telegram token you receive from @BotFather
-const token = config.telegram.token;
+const {token} = config.telegram;
 
 // Create a bot that uses 'polling' to fetch new updates
 const bot = new TelegramBot(token, {polling: true});
 
-function randomDice() {
-  const randHex = crypto.randomBytes(4)
-    .toString('hex');
-  return parseInt(randHex, 16) % 10;
-}
-
-/* test
-console.log(randomDice());
-
-const res = {};
-for (let i = 0; i < 10000; i++) {
-  const val = randomDice();
-  if (res[val]===undefined) {
-    res[val] = 0;
-  }
-  else {
-    res[val]++
-  }
-}
-console.log(res);
-*/
-function parseRequest(str) {
-  str = str.trim();
-  let difficulty = 6;
-  let diceNumber = str;
-  if (str.indexOf('x') !== -1) {
-    const arr = str.split('x');
-    if (arr.length > 2) {
-      throw new Error('too many x!');
-    }
-    difficulty = arr[1];
-    diceNumber = arr[0];
-  }
-  difficulty = parseInt(difficulty);
-  diceNumber = parseInt(diceNumber);
-  if (isNaN(difficulty)) {
-    throw new Error('Wrong value for difficulty!');
-  }
-  if (isNaN(diceNumber)) {
-    throw new Error('Wrong value for dice number!');
-  }
-  if (diceNumber > 20) {
-    throw new Error('Please spare me, Kain!');
-  }
-  return {difficulty, diceNumber};
-}
-
-function throwDices(difficulty, diceNumber) {
-  const res = {
-    values: [],
-    one: 0,
-    success: 0,
-    task: `throwing ${diceNumber} dices with ${difficulty} difficulty`
-  };
-  for (let i = 0; i < diceNumber; i++) {
-    const val = randomDice();
-    if (val === 1) {
-      res.one++;
-    }
-    else if (val >= difficulty || val === 0) {
-      res.success++;
-    }
-    res.values.push(val);
-  }
-  return res;
-}
-
-function parseResult(res) {
-  const result = {values: res.values, task: res.task};
-  result.success = res.success - res.one;
-  if (result.success < 0) {
-    result.msg = 'Botch!';
-    result.success = 0;
-    return result;
-  }
-  if (result.success === 0) {
-    result.msg = 'Fail!';
-    return result;
-  }
-  if (result.success === 1) {
-    result.msg = 'Success... Marginal.';
-    return result;
-  }
-  if (result.success === 2) {
-    result.msg = 'Success... Moderate.';
-    return result;
-  }
-  if (result.success === 3) {
-    result.msg = 'Success. Complete!';
-    return result;
-  }
-  if (result.success === 4) {
-    result.msg = 'Success. Exceptional!!';
-    return result;
-  }
-  result.msg = 'Success!!! Phenomenal!!!';
-  return result;
-}
-
-function resultToStr(res) {
-  return `Task: ${res.task}\nResult: ${res.values.join(', ')}\nSuccesses: ${res.success}\nMessage: ${res.msg}`;
-}
-
-/*
-const test = '5x8';
-const params = parseRequest(test);
-const res = throwDices(params.difficulty, params.diceNumber);
-const reply = parseResult(res);
-const resStr=resultToStr(reply);
-console.log(resStr);
-*/
-
-
 bot.on('polling_error', (error) => {
-  console.log("Polling error: " + error.code);  // => 'EFATAL'
-  console.log(error);
+  debug('Polling error', error);  // => 'EFATAL'
+  debug(error);
 });
 
 bot.on('webhook_error', (error) => {
-  console.log("Webhook error: " + error.code);  // => 'EPARSE'
+  debug('Webhook error', error);  // => 'EPARSE'
 });
 
 // Matches "/echo [whatever]"
-bot.onText(/\/start/, function (msg, match) {
-  console.log('start');
+bot.onText(/\/start/, (msg) => {
+  debug('start message from user');
   const chatId = msg.chat.id || msg.from.id;
-  bot.sendMessage(chatId, 'Please enter message as "axb" where a is a number of dice and x is difficulty');
+  bot.sendMessage(chatId, 'Please enter message'
+    + ' as "axb" where a is a number of dice and b'
+    + ' is difficulty. You can also add keyword "spec"'
+    + ' if it is speciality or "damage" if it is damage.');
 });
 
 // Listen for any kind of message. There are different kinds of
 // messages.
+
+
+const messageFromGroup = ['/roll', '/roll@WodThrowBot', '/хуйни', '/хуйни@WodThrowBot', '/кшдд', '/кшдд@WodThrowBot'];
 bot.on('message', (msg) => {
-  if (!msg || msg.text[0] === '/start') {
+  debug(`message from user: ${JSON.stringify(msg)}`);
+  if (!msg || msg.text === '/start') {
+    debug('Empty or start message ignoring');
     return;
   }
-  msg.text = msg.text.replace('/roll', '').trim();
-  console.log('message');
-  console.log(msg);
+
+  let command;
+  if (msg.chat.type !== 'private') // group chat
+  {
+    const isOur = messageFromGroup.some(key=>msg.text && msg.text.includes(key));
+    if (!isOur)
+    {
+      debug('not for us, ignoring');
+      return;
+    }
+    command = messageFromGroup.reduce((res, item) => res.replace(item, ''), msg.text)
+      .toLowerCase()
+      .trim();
+  }
+  else // personal chat
+  {
+    command = messageFromGroup.reduce((res, item) => res.replace(item, ''), msg.text)
+      .toLowerCase()
+      .trim();
+  }
   const chatId = msg.chat.id || msg.from.id;
   let params;
   try {
-    params = parseRequest(msg.text);
+    params = utils.parseRequest(command);
   }
   catch (e) {
     bot.sendMessage(chatId, e.toString());
     return;
   }
-  const res = throwDices(params.difficulty, params.diceNumber);
-  const reply = parseResult(res);
-  const resStr = resultToStr(reply);
-  // send a message to the chat acknowledging receipt of their message
-  bot.sendMessage(chatId, resStr);
+  const res = utils.throwDices(params);
+  const reply = utils.parseResult(res);
+  const resStr = utils.resultToStr(reply, msg.from.username);
+  Promise.delay(200)
+    .then(() => bot.sendChatAction(chatId, 'typing'))
+    .then(() => Promise.delay(2000))
+    .then(() => bot.sendMessage(chatId, resStr));
 });
