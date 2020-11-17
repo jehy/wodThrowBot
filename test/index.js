@@ -26,7 +26,6 @@ describe('Some simple tests', () => {
   });
 });
 
-
 describe('Parsing request', () => {
   it('should be able to process russian input', () => {
     const test = '5х8';
@@ -81,7 +80,6 @@ describe('Parsing request', () => {
     debug(test);
     debug(resStr);
   });
-
 
   it('should be able to process speciality throws', () => {
     const test = '5 8 spec';
@@ -298,7 +296,6 @@ describe('passing message', () => {
     debug(resStr);
   });
 
-
   it('should be able to pass message (no flags, difficulty)', () => {
     const test = '5 8 Blah-blah blah!';
     const params = utils.parseRequest(test);
@@ -316,7 +313,6 @@ describe('passing message', () => {
     debug(test);
     debug(resStr);
   });
-
 
   it('should be able to pass (all flags)', () => {
     const test = '5 8 spec damage Blah-blah blah!';

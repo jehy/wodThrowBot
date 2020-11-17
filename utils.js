@@ -20,7 +20,7 @@ function parseRequest(str) {
   if (str[0] === 'х' || str[1] === 'х') { // rus
     str = str.replace('х', ' ');
   }
-  const arr = str.trim().split(' ').map(el => el.trim());
+  const arr = str.trim().split(' ').map((el) => el.trim());
   const diceNumber = parseInt(arr[0], 10);
   if (!Number.isNaN(parseInt(arr[1], 10))) {
     difficulty = parseInt(arr[1], 10);

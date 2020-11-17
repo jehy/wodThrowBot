@@ -5,7 +5,6 @@ const config = require('config');
 const debug = require('debug')('throwBot');
 const Promise = require('bluebird');
 
-
 const utils = require('./utils');
 
 // replace the value below with the Telegram token you receive from @BotFather
@@ -36,7 +35,6 @@ bot.onText(/\/start/, (msg) => {
 // Listen for any kind of message. There are different kinds of
 // messages.
 
-
 const messageFromGroup = ['/roll', '/roll@WodThrowBot', '/хуйни', '/хуйни@WodThrowBot', '/кшдд', '/кшдд@WodThrowBot'];
 bot.on('message', (msg) => {
   debug(`message from user: ${JSON.stringify(msg)}`);
@@ -48,7 +46,7 @@ bot.on('message', (msg) => {
   let command;
   if (msg.chat.type !== 'private') // group chat
   {
-    const isOur = messageFromGroup.some(key=>msg.text && msg.text.includes(key));
+    const isOur = messageFromGroup.some((key)=>msg.text && msg.text.includes(key));
     if (!isOur)
     {
       debug('not for us, ignoring');
