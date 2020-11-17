@@ -96,7 +96,7 @@ bot.on('inline_query', async (msg)=>{
     description: res.task,
     input_message_content: {message_text: res.text},
   };
-  await bot.answerInlineQuery(msg.id, [inlineQueryResult]);
+  await bot.answerInlineQuery(msg.id, [inlineQueryResult], {cache_time: 0});
 });
 
 bot.on('message', async (msg)=>{
