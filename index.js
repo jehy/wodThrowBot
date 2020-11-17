@@ -67,7 +67,7 @@ async function processMessage(command, userName) {
   const params = utils.parseRequest(command);
   const res = utils.throwDices(params);
   const reply = utils.parseResult(res);
-  return utils.resultToStr(reply, userName);
+  return {text: utils.resultToStr(reply, userName), task: res.task};
 }
 
 bot.on('inline_query', async (msg)=>{
@@ -93,8 +93,8 @@ bot.on('inline_query', async (msg)=>{
     type: 'article',
     id: '1',
     title: 'Throw dice',
-    description: command,
-    input_message_content: {message_text: res},
+    description: res.task,
+    input_message_content: {message_text: res.text},
   };
   await bot.answerInlineQuery(msg.id, [inlineQueryResult]);
 });
@@ -122,5 +122,5 @@ bot.on('message', async (msg)=>{
   await Promise.delay(200);
   await bot.sendChatAction(chatId, 'typing');
   await Promise.delay(2000);
-  await bot.sendMessage(chatId, res);
+  await bot.sendMessage(chatId, res.text);
 });
