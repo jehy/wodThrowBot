@@ -23,10 +23,10 @@ bot.on('webhook_error', (error) => {
 });
 
 // Matches "/echo [whatever]"
-bot.onText(/\/start/, (msg) => {
+bot.onText(/\/start/, async (msg) => {
   debug('start message from user');
   const chatId = msg.chat.id || msg.from.id;
-  bot.sendMessage(chatId, 'Please enter message'
+  await bot.sendMessage(chatId, 'Please enter message'
     + ' as "axb" where a is a number of dice and b'
     + ' is difficulty. You can also add keyword "spec"'
     + ' if it is speciality or "damage" if it is damage.', {
@@ -40,46 +40,87 @@ bot.onText(/\/start/, (msg) => {
 // messages.
 
 const messageFromGroup = ['/roll', '/roll@WodThrowBot', '/хуйни', '/хуйни@WodThrowBot', '/кшдд', '/кшдд@WodThrowBot'];
-bot.on('message', (msg) => {
-  debug(`message from user: ${JSON.stringify(msg)}`);
-  if (!msg || msg.text === '/start') {
+
+function messageToCommand(msg, inline = false)
+{
+  const query = inline ? msg.query : msg.text;
+  if (inline || msg.chat.type === 'private')
+  {
+    return messageFromGroup.reduce((res, item) => res.replace(item, ''), query)
+      .toLowerCase()
+      .trim();
+  }
+  // group chat
+  const isOur = messageFromGroup.some((key)=>query && query.includes(key));
+  if (!isOur)
+  {
+    debug('not for us, ignoring');
+    return false;
+  }
+  return messageFromGroup.reduce((res, item) => res.replace(item, ''), query)
+    .toLowerCase()
+    .trim();
+
+}
+
+async function processMessage(command, userName) {
+  const params = utils.parseRequest(command);
+  const res = utils.throwDices(params);
+  const reply = utils.parseResult(res);
+  return utils.resultToStr(reply, userName);
+}
+
+bot.on('inline_query', async (msg)=>{
+  debug(`inline message from user: ${JSON.stringify(msg)}`);
+  if (!msg || !msg.query) {
     debug('Empty or start message ignoring');
     return;
   }
-
-  let command;
-  if (msg.chat.type !== 'private') // group chat
-  {
-    const isOur = messageFromGroup.some((key)=>msg.text && msg.text.includes(key));
-    if (!isOur)
-    {
-      debug('not for us, ignoring');
-      return;
-    }
-    command = messageFromGroup.reduce((res, item) => res.replace(item, ''), msg.text)
-      .toLowerCase()
-      .trim();
-  }
-  else // personal chat
-  {
-    command = messageFromGroup.reduce((res, item) => res.replace(item, ''), msg.text)
-      .toLowerCase()
-      .trim();
-  }
-  const chatId = msg.chat.id || msg.from.id;
-  let params;
+  const chatId =  msg.from.id;
+  const command = messageToCommand(msg, true);
+  let res;
   try {
-    params = utils.parseRequest(command);
+    res = await processMessage(command, msg.from.username);
   }
   catch (e) {
-    bot.sendMessage(chatId, e.toString());
+    await bot.sendMessage(chatId, e.toString());
     return;
   }
-  const res = utils.throwDices(params);
-  const reply = utils.parseResult(res);
-  const resStr = utils.resultToStr(reply, msg.from.username);
-  Promise.delay(200)
-    .then(() => bot.sendChatAction(chatId, 'typing'))
-    .then(() => Promise.delay(2000))
-    .then(() => bot.sendMessage(chatId, resStr));
+  if (!res) {
+    return;
+  }
+  const inlineQueryResult = {
+    type: 'article',
+    id: '1',
+    title: 'Throw dice',
+    description: command,
+    input_message_content: {message_text: res},
+  };
+  await bot.answerInlineQuery(msg.id, [inlineQueryResult]);
+});
+
+bot.on('message', async (msg)=>{
+
+  debug(`message from user: ${JSON.stringify(msg)}`);
+  if (!msg || !msg.text || msg.text === '/start') {
+    debug('Empty or start message ignoring');
+    return;
+  }
+  const command = messageToCommand(msg);
+  const chatId = msg.chat.id || msg.from.id;
+  let res;
+  try {
+    res = await processMessage(command, msg.from.username);
+  }
+  catch (e) {
+    await bot.sendMessage(chatId, e.toString());
+    return;
+  }
+  if (!res) {
+    return;
+  }
+  await Promise.delay(200);
+  await bot.sendChatAction(chatId, 'typing');
+  await Promise.delay(2000);
+  await bot.sendMessage(chatId, res);
 });
