@@ -29,7 +29,11 @@ bot.onText(/\/start/, (msg) => {
   bot.sendMessage(chatId, 'Please enter message'
     + ' as "axb" where a is a number of dice and b'
     + ' is difficulty. You can also add keyword "spec"'
-    + ' if it is speciality or "damage" if it is damage.');
+    + ' if it is speciality or "damage" if it is damage.', {
+    reply_markup: JSON.stringify({
+      remove_keyboard: true,
+    }),
+  });
 });
 
 // Listen for any kind of message. There are different kinds of
