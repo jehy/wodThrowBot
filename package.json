@@ -13,7 +13,7 @@
     "test_verbose": "npm run lint && DEBUG=throwBot:test mocha -t 10000 --exit",
     "check_coverage": "nyc check-coverage --lines 80 --functions 80 --branches 80",
     "coverage": "nyc npm test && npm run check_coverage",
-    "coveralls": "nyc report --reporter=text-lcov | coveralls"
+    "coverage-report": "npm run coverage && nyc report --reporter=lcov"
   },
   "repository": {
     "type": "git",
