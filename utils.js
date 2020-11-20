@@ -46,6 +46,24 @@ function getProps(options) {
   };
 }
 
+function getTask(options)
+{
+  let task = `throwing ${options.diceNumber} dices`;
+  if (!options.summ) {
+    task += `with ${options.difficulty} difficulty`;
+  }
+  if (options.base !== 10) {
+    task += ` base ${options.base}`;
+  }
+  if (options.special) {
+    task += ' using speciality';
+  }
+  if (options.damage) {
+    task += ' (damage, 1 does not subtract)';
+  }
+  return task;
+}
+
 function parseRequest(str) {
   /* let difficulty = 6;
   // support for old syntax with x, both russian and english
@@ -67,48 +85,38 @@ function parseRequest(str) {
   // eslint-disable-next-line no-console
   const diceNumber = parseInt(arr[1], 10);
   const base = parseInt(arr[2], 10) || 10;
-  const difficulty = parseInt(arr[4], 10) || 6;
   const options = str.replace(arr[0], '').trim().split(' ');
   const {
     special, damage, action, summ,
   } = getProps(options);
+  const difficulty = summ ? 0 : (parseInt(arr[4], 10) || 6);
   if (Number.isNaN(diceNumber)) {
     throw new Error('Wrong value for dice number!');
   }
   if (diceNumber > 30) {
-    throw new Error('Please spare me, Kain!');
+    throw new Error(`Please spare me, Kain! ${diceNumber} dice is too much!`);
   }
   if (difficulty > base) {
-    throw new Error('You don`t like easy task, yeah?');
+    throw new Error(`You don\`t like easy task, yeah? Difficulty ${difficulty} is more then base ${base}`);
   }
+  const task = getTask({
+    diceNumber, special, damage, action, base, summ, difficulty,
+  });
   return {
-    difficulty, diceNumber, special, damage, action, base, summ,
+    diceNumber, special, damage, action, base, summ, difficulty, task,
   };
 }
 
 function throwDices(options) {
   const {
-    difficulty, diceNumber, special, damage, base,
+    diceNumber, base,
   } = options;
-  const res = {
-    values: [],
-    task: `throwing ${diceNumber} dices with ${difficulty} difficulty`,
-    options,
-  };
-  if (base !== 10) {
-    res.task += ` base ${base}`;
-  }
-  if (special) {
-    res.task += ' using speciality';
-  }
-  if (damage) {
-    res.task += ' (damage, 1 does not subtract)';
-  }
+  const values = [];
   for (let i = 0; i < diceNumber; i++) {
     const val = randomDice(base);
-    res.values.push(val);
+    values.push(val);
   }
-  return res;
+  return {values, options};
 }
 
 const messages = [
@@ -132,8 +140,11 @@ function getSuccessMessage(success) {
   return messages[success.count];
 }
 
-function getSuccesses(res) {
-  const difficulty = res.options.difficulty || 6;
+function getSuccesses(params, res) {
+  if (!params.difficulty) {
+    throw new Error('No difficulty specified');
+  }
+  const {difficulty} = params;
   const one = res.values.reduce((acc, val)=>{
     if (val === 1) {
       return acc + 1;
@@ -142,7 +153,7 @@ function getSuccesses(res) {
   }, 0);
   const allSuccesses = res.values.reduce((acc, val)=>{
     if (val >= difficulty) {
-      if (val === 10 && res.options.special) {
+      if (val === 10 && params.special) {
         return acc + 2;
       }
       return acc + 1;
@@ -150,7 +161,7 @@ function getSuccesses(res) {
     return acc;
   }, 0);
   const hadSuccesses = allSuccesses > 0;
-  if (res.options.damage) {
+  if (params.damage) {
     const status = allSuccesses > 0 ? throwStatus.success : throwStatus.fail;
     return {count: allSuccesses, status};
   }
@@ -170,19 +181,23 @@ function getSumm(res) {
   return res.values.reduce((acc, item)=>item + acc, 0);
 }
 
-function parseResult(res) {
-  const success = getSuccesses(res);
-  return res.options.summ ? {
-    values: res.values,
-    task: res.task,
-    action: res.options.action,
-    summ: getSumm(res),
-  } : {
+function parseResult(params, res) {
+  if (params.summ) {
+    return  {
+      values: res.values,
+      action: params.action,
+      task: params.task,
+      summ: getSumm(res),
+    };
+  }
+
+  const success = getSuccesses(params, res);
+  return {
     success: success.count,
     values: res.values,
-    task: res.task,
     successMessage: getSuccessMessage(success, res),
-    action: res.options.action,
+    action: params.action,
+    task: params.task,
   };
 }
 

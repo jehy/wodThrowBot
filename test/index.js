@@ -14,15 +14,18 @@ describe('Some simple tests', () => {
     }
   });
 
-  it('should be able to process some inputs', () => {
-
-    for (let i = 0; i < 100; i++) {
-      const test = '5x8';
-      const params = utils.parseRequest(test);
-      const res = utils.throwDices(params);
-      const reply = utils.parseResult(res);
-      const resStr = utils.resultToStr(reply);
-    }
+  describe('should be able to process some inputs', () => {
+    const tests = ['5x8', '3d6x6', '3d6 sum', '3d6 summ', '5d6x4 summ damage spec'];
+    tests.forEach((test)=>{
+      it(test, ()=>{
+        for (let i = 0; i < 100; i++) {
+          const params = utils.parseRequest(test);
+          const res = utils.throwDices(params);
+          const reply = utils.parseResult(params, res);
+          const resStr = utils.resultToStr(reply);
+        }
+      });
+    });
   });
 });
 
@@ -37,7 +40,7 @@ describe('Parsing request', () => {
     assert.equal(params.damage, false);
     assert.equal(params.action, '');
     const res = utils.throwDices(params);
-    const reply = utils.parseResult(res);
+    const reply = utils.parseResult(params, res);
     const resStr = utils.resultToStr(reply);
     assert.isNotTrue(resStr.includes('damage'));
     assert.isNotTrue(resStr.includes('special'));
@@ -55,7 +58,7 @@ describe('Parsing request', () => {
     assert.equal(params.damage, false);
     assert.equal(params.action, '');
     const res = utils.throwDices(params);
-    const reply = utils.parseResult(res);
+    const reply = utils.parseResult(params, res);
     const resStr = utils.resultToStr(reply);
     assert.isNotTrue(resStr.includes('damage'));
     assert.isNotTrue(resStr.includes('special'));
@@ -79,7 +82,7 @@ describe('Parsing request', () => {
     assert.equal(params.damage, false);
     assert.equal(params.action, '');
     const res = utils.throwDices(params);
-    const reply = utils.parseResult(res);
+    const reply = utils.parseResult(params, res);
     const resStr = utils.resultToStr(reply);
     assert.isNotTrue(resStr.includes('damage'));
     assert.isTrue(resStr.includes('special'));
@@ -106,7 +109,7 @@ describe('Parsing request', () => {
     assert.equal(params.special, false);
     assert.equal(params.action, '');
     const res = utils.throwDices(params);
-    const reply = utils.parseResult(res);
+    const reply = utils.parseResult(params, res);
     const resStr = utils.resultToStr(reply);
     assert.isTrue(resStr.includes('damage'));
     assert.isNotTrue(resStr.includes('special'));
@@ -133,7 +136,7 @@ describe('Parsing request', () => {
     assert.equal(params.special, true);
     assert.equal(params.action, '');
     const res = utils.throwDices(params);
-    const reply = utils.parseResult(res);
+    const reply = utils.parseResult(params, res);
     const resStr = utils.resultToStr(reply);
     assert.isTrue(resStr.includes('damage'));
     assert.isTrue(resStr.includes('special'));
@@ -149,17 +152,14 @@ describe('counting successes', () => {
   it('should count simple successes', () => {
     const diceResult = {
       values: [6, 7],
-      task: 'some task',
-      options: {
-        action: 'some action',
-      },
     };
-    const reply = utils.parseResult(diceResult);
+    const params = {task: 'some task', action: 'some action', difficulty: 6};
+    const reply = utils.parseResult(params, diceResult);
     assert.deepEqual(reply, {
       success: 2,
       values: [6, 7],
-      task: 'some task',
       successMessage: 'Success... Moderate.',
+      task: 'some task',
       action: 'some action',
     });
   });
@@ -167,12 +167,9 @@ describe('counting successes', () => {
   it('should count successes and subtract botches', () => {
     const diceResult = {
       values: [1, 7],
-      task: 'some task',
-      options: {
-        action: 'some action',
-      },
     };
-    const reply = utils.parseResult(diceResult);
+    const params = {task: 'some task', action: 'some action', difficulty: 6};
+    const reply = utils.parseResult(params, diceResult);
     assert.deepEqual(reply, {
       success: 0,
       values: [1, 7],
@@ -185,13 +182,11 @@ describe('counting successes', () => {
   it('should count successes and not subtract botches in damage mode', () => {
     const diceResult = {
       values: [1, 7],
-      task: 'some task',
-      options: {
-        action: 'some action',
-        damage: true,
-      },
     };
-    const reply = utils.parseResult(diceResult);
+    const params = {
+      task: 'some task', action: 'some action', damage: true, difficulty: 6,
+    };
+    const reply = utils.parseResult(params, diceResult);
     assert.deepEqual(reply, {
       success: 1,
       values: [1, 7],
@@ -202,15 +197,13 @@ describe('counting successes', () => {
   });
 
   it('should count successes when using speciality', () => {
+    const params = {
+      task: 'some task', action: 'some action', special: true, difficulty: 6,
+    };
     const diceResult = {
       values: [5, 10],
-      task: 'some task',
-      options: {
-        action: 'some action',
-        special: true,
-      },
     };
-    const reply = utils.parseResult(diceResult);
+    const reply = utils.parseResult(params, diceResult);
     assert.deepEqual(reply, {
       success: 2,
       values: [5, 10],
@@ -223,14 +216,11 @@ describe('counting successes', () => {
   it('should count successes when using speciality and damage mode', () => {
     const diceResult = {
       values: [5, 10, 1],
-      task: 'some task',
-      options: {
-        action: 'some action',
-        damage: true,
-        special: true,
-      },
     };
-    const reply = utils.parseResult(diceResult);
+    const params = {
+      task: 'some task', action: 'some action', damage: true, special: true, difficulty: 6,
+    };
+    const reply = utils.parseResult(params, diceResult);
     assert.deepEqual(reply, {
       success: 2,
       values: [5, 10, 1],
@@ -242,17 +232,15 @@ describe('counting successes', () => {
   it('should count summ', () => {
     const diceResult = {
       values: [1, 2, 3],
-      task: 'some task',
-      options: {
-        action: 'some action',
-        summ: true,
-      },
     };
-    const reply = utils.parseResult(diceResult);
+    const params = {
+      task: 'some task', action: 'some action', summ: true, difficulty: 6,
+    };
+    const reply = utils.parseResult(params, diceResult);
     assert.deepEqual(reply, {
       values: [1, 2, 3],
-      task: 'some task',
       action: 'some action',
+      task: 'some task',
       summ: 6,
     });
   });
@@ -268,7 +256,7 @@ describe('passing message', () => {
     assert.equal(params.special, false);
     assert.equal(params.action, 'Blah-blah blah!');
     const res = utils.throwDices(params);
-    const reply = utils.parseResult(res);
+    const reply = utils.parseResult(params, res);
     const resStr = utils.resultToStr(reply);
     assert.isNotTrue(resStr.includes('damage'));
     assert.isNotTrue(resStr.includes('special'));
@@ -286,7 +274,7 @@ describe('passing message', () => {
     assert.equal(params.special, false);
     assert.equal(params.action, 'Blah-blah blah!');
     const res = utils.throwDices(params);
-    const reply = utils.parseResult(res);
+    const reply = utils.parseResult(params, res);
     const resStr = utils.resultToStr(reply);
     assert.isNotTrue(resStr.includes('damage'));
     assert.isNotTrue(resStr.includes('special'));
@@ -304,7 +292,7 @@ describe('passing message', () => {
     assert.equal(params.special, true);
     assert.equal(params.action, 'Blah-blah blah!');
     const res = utils.throwDices(params);
-    const reply = utils.parseResult(res);
+    const reply = utils.parseResult(params, res);
     const resStr = utils.resultToStr(reply);
     assert.isTrue(resStr.includes('damage'));
     assert.isTrue(resStr.includes('special'));
@@ -321,7 +309,7 @@ describe('passing message', () => {
     assert.equal(params.special, false);
     assert.equal(params.action, 'еби гусей');
     const res = utils.throwDices(params);
-    const reply = utils.parseResult(res);
+    const reply = utils.parseResult(params, res);
     const resStr = utils.resultToStr(reply);
     assert.isNotTrue(resStr.includes('damage'));
     assert.isNotTrue(resStr.includes('special'));
@@ -338,7 +326,7 @@ describe('passing message', () => {
     assert.equal(params.special, false);
     assert.equal(params.action, 'No damage intended!');
     const res = utils.throwDices(params);
-    const reply = utils.parseResult(res);
+    const reply = utils.parseResult(params, res);
     const resStr = utils.resultToStr(reply);
     assert.isTrue(resStr.includes('Action: No damage intended!'));
     debug(test);
@@ -353,7 +341,7 @@ describe('passing message', () => {
     assert.equal(params.special, false);
     assert.equal(params.action, 'Damage to troll');
     const res = utils.throwDices(params);
-    const reply = utils.parseResult(res);
+    const reply = utils.parseResult(params, res);
     const resStr = utils.resultToStr(reply);
     assert.isTrue(resStr.includes('Action: Damage to troll'));
     debug(test);
@@ -369,7 +357,7 @@ describe('passing message', () => {
     assert.equal(params.special, false);
     assert.equal(params.action, 'd6 damage');
     const res = utils.throwDices(params);
-    const reply = utils.parseResult(res);
+    const reply = utils.parseResult(params, res);
     const resStr = utils.resultToStr(reply);
     assert.isTrue(resStr.includes('Action: d6 damage'));
     debug(test);

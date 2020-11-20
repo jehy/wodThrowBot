@@ -66,8 +66,8 @@ function messageToCommand(msg, inline = false)
 async function processMessage(command, userName) {
   const params = utils.parseRequest(command);
   const res = utils.throwDices(params);
-  const reply = utils.parseResult(res);
-  return {text: utils.resultToStr(reply, userName), task: res.task};
+  const reply = utils.parseResult(params, res);
+  return {text: utils.resultToStr(reply, userName), task: params.task};
 }
 
 bot.on('inline_query', async (msg)=>{
