@@ -9,8 +9,8 @@
   "scripts": {
     "start": "DEBUG=throwBot node --use_strict index.js",
     "lint": "./node_modules/.bin/eslint index.js utils.js test bin",
-    "test": "npm run lint && mocha -t 10000 --exit",
-    "test_verbose": "npm run lint && DEBUG=throwBot:test mocha -t 10000 --exit",
+    "test": "mocha -t 10000 --exit",
+    "test_verbose": "DEBUG=throwBot:test mocha -t 10000 --exit",
     "check_coverage": "nyc check-coverage --lines 80 --functions 80 --branches 80",
     "coverage": "nyc npm test && npm run check_coverage",
     "coverage-report": "npm run coverage && nyc report --reporter=lcov"
@@ -47,7 +47,7 @@
   "husky": {
     "hooks": {
       "pre-commit": "lint-staged",
-      "pre-push": "npm test"
+      "pre-push": "npm run lint && npm test"
     }
   },
   "lint-staged": {

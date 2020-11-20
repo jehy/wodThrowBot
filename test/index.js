@@ -30,6 +30,7 @@ describe('Parsing request', () => {
   it('should be able to process russian input', () => {
     const test = '5х8';
     const params = utils.parseRequest(test);
+    // eslint-disable-next-line no-console
     assert.equal(params.diceNumber, 5);
     assert.equal(params.difficulty, 8);
     assert.equal(params.special, false);
@@ -147,12 +148,9 @@ describe('counting successes', () => {
 
   it('should count simple successes', () => {
     const diceResult = {
-      success: 2,
       values: [6, 7],
       task: 'some task',
-      one: 0,
       options: {
-        message: 'some message',
         action: 'some action',
       },
     };
@@ -161,20 +159,16 @@ describe('counting successes', () => {
       success: 2,
       values: [6, 7],
       task: 'some task',
-      msg: 'Success... Moderate.',
-      message: 'some message',
+      successMessage: 'Success... Moderate.',
       action: 'some action',
     });
   });
 
   it('should count successes and subtract botches', () => {
     const diceResult = {
-      success: 1,
       values: [1, 7],
       task: 'some task',
-      one: 1,
       options: {
-        message: 'some message',
         action: 'some action',
       },
     };
@@ -183,20 +177,16 @@ describe('counting successes', () => {
       success: 0,
       values: [1, 7],
       task: 'some task',
-      message: 'some message',
       action: 'some action',
-      msg: 'Fail!',
+      successMessage: 'Fail!',
     });
   });
 
   it('should count successes and not subtract botches in damage mode', () => {
     const diceResult = {
-      success: 1,
       values: [1, 7],
       task: 'some task',
-      one: 1,
       options: {
-        message: 'some message',
         action: 'some action',
         damage: true,
       },
@@ -206,55 +196,64 @@ describe('counting successes', () => {
       success: 1,
       values: [1, 7],
       task: 'some task',
-      message: 'some message',
       action: 'some action',
-      msg: 'Success... Marginal.',
+      successMessage: 'Success... Marginal.',
     });
   });
 
   it('should count successes when using speciality', () => {
     const diceResult = {
-      success: 2,
-      values: [5, 0],
+      values: [5, 10],
       task: 'some task',
-      one: 0,
       options: {
-        message: 'some message',
         action: 'some action',
-        damage: true,
+        special: true,
       },
     };
     const reply = utils.parseResult(diceResult);
     assert.deepEqual(reply, {
       success: 2,
-      values: [5, 0],
+      values: [5, 10],
       task: 'some task',
-      message: 'some message',
       action: 'some action',
-      msg: 'Success... Moderate.',
+      successMessage: 'Success... Moderate.',
     });
   });
 
   it('should count successes when using speciality and damage mode', () => {
     const diceResult = {
-      success: 1,
-      values: [5, 0, 1],
+      values: [5, 10, 1],
       task: 'some task',
-      one: 1,
       options: {
-        message: 'some message',
         action: 'some action',
         damage: true,
+        special: true,
       },
     };
     const reply = utils.parseResult(diceResult);
     assert.deepEqual(reply, {
-      success: 1,
-      values: [5, 0, 1],
+      success: 2,
+      values: [5, 10, 1],
       task: 'some task',
-      message: 'some message',
       action: 'some action',
-      msg: 'Success... Marginal.',
+      successMessage: 'Success... Moderate.',
+    });
+  });
+  it('should count summ', () => {
+    const diceResult = {
+      values: [1, 2, 3],
+      task: 'some task',
+      options: {
+        action: 'some action',
+        summ: true,
+      },
+    };
+    const reply = utils.parseResult(diceResult);
+    assert.deepEqual(reply, {
+      values: [1, 2, 3],
+      task: 'some task',
+      action: 'some action',
+      summ: 6,
     });
   });
 });

@@ -10,6 +10,41 @@ function randomDice(base) {
 
 const specCommand = ['spec', 's', 'ы'];
 const dmgCommand = ['dmg', 'd', 'damage', 'в'];
+const summCommand = ['summ'];
+
+function getProps(options) {
+  let special = false;
+  let damage = false;
+  let action = '';
+  let actionMessageStarted = false;
+  let summ = false;
+
+  options.forEach((element) => {
+    if (!actionMessageStarted) {
+      if (!special && specCommand.includes(element))
+      {
+        special = true;
+        return;
+      }
+      if (!damage && dmgCommand.includes(element)) {
+        damage = true;
+        return;
+      }
+      if (!summ && summCommand.includes(element)) {
+        summ = true;
+        return;
+      }
+    }
+    action = `${action} ${element}`.trim();
+    actionMessageStarted = true;
+  });
+  return {
+    special,
+    damage,
+    action,
+    summ,
+  };
+}
 
 function parseRequest(str) {
   /* let difficulty = 6;
@@ -29,29 +64,14 @@ function parseRequest(str) {
     throw new Error('You really like long things, dont you?');
   }
   const arr = str.match(/(\d{0,2})d{0,1}(\d{0,2})(x|х{0,1})(\d{0,2})/i);
-  // console.log(`${str}=>${JSON.stringify(arr)}`);
+  // eslint-disable-next-line no-console
   const diceNumber = parseInt(arr[1], 10);
   const base = parseInt(arr[2], 10) || 10;
   const difficulty = parseInt(arr[4], 10) || 6;
   const options = str.replace(arr[0], '').trim().split(' ');
-  const {special, damage, action} = options.reduce((res, element, index) => {
-    if (!res.actionMessageStarted && !res.special && specCommand.includes(element) && index < 4) {
-      res.special = true;
-      return res;
-    }
-    if (!res.actionMessageStarted && !res.damage && dmgCommand.includes(element) && index < 4) {
-      res.damage = true;
-      return res;
-    }
-    res.action = `${res.action} ${element}`.trim();
-    res.actionMessageStarted = true;
-    return res;
-  }, {
-    special: false,
-    damage: false,
-    action: '',
-    actionMessageStarted: false,
-  });
+  const {
+    special, damage, action, summ,
+  } = getProps(options);
   if (Number.isNaN(diceNumber)) {
     throw new Error('Wrong value for dice number!');
   }
@@ -62,7 +82,7 @@ function parseRequest(str) {
     throw new Error('You don`t like easy task, yeah?');
   }
   return {
-    difficulty, diceNumber, special, damage, action, base,
+    difficulty, diceNumber, special, damage, action, base, summ,
   };
 }
 
@@ -72,8 +92,6 @@ function throwDices(options) {
   } = options;
   const res = {
     values: [],
-    one: 0,
-    success: 0,
     task: `throwing ${diceNumber} dices with ${difficulty} difficulty`,
     options,
   };
@@ -84,22 +102,10 @@ function throwDices(options) {
     res.task += ' using speciality';
   }
   if (damage) {
-    res.task += ' (damage, 1 is only fail)';
+    res.task += ' (damage, 1 does not subtract)';
   }
   for (let i = 0; i < diceNumber; i++) {
     const val = randomDice(base);
-    if (val === 1) {
-      res.one++;
-    }
-    else if (val === 10) {
-      if (special) {
-        res.success += 2;
-      }
-      else res.success++;
-    }
-    else if (val >= difficulty) {
-      res.success++;
-    }
     res.values.push(val);
   }
   return res;
@@ -114,34 +120,85 @@ const messages = [
   'Success!!! Phenomenal!!!',
 ];
 
+const throwStatus = {botch: 1, success: 1, fail: 3};
+
+function getSuccessMessage(success) {
+  if (!success.status === throwStatus.botch) {
+    return 'Botch!';
+  }
+  if (success >= 5) {
+    return messages[5];
+  }
+  return messages[success.count];
+}
+
+function getSuccesses(res) {
+  const difficulty = res.options.difficulty || 6;
+  const one = res.values.reduce((acc, val)=>{
+    if (val === 1) {
+      return acc + 1;
+    }
+    return acc;
+  }, 0);
+  const allSuccesses = res.values.reduce((acc, val)=>{
+    if (val >= difficulty) {
+      if (val === 10 && res.options.special) {
+        return acc + 2;
+      }
+      return acc + 1;
+    }
+    return acc;
+  }, 0);
+  const hadSuccesses = allSuccesses > 0;
+  if (res.options.damage) {
+    const status = allSuccesses > 0 ? throwStatus.success : throwStatus.fail;
+    return {count: allSuccesses, status};
+  }
+  let status;
+  const count = Math.max(allSuccesses - one, 0);
+  if (!hadSuccesses && one) {
+    status = throwStatus.botch;
+  } else if (count < 1) {
+    status = throwStatus.fail;
+  } else {
+    status = throwStatus.success;
+  }
+  return {count, status};
+}
+
+function getSumm(res) {
+  return res.values.reduce((acc, item)=>item + acc, 0);
+}
+
 function parseResult(res) {
-  const result = {
-    success: res.success,
+  const success = getSuccesses(res);
+  return res.options.summ ? {
     values: res.values,
     task: res.task,
-    message: res.options.message,
+    action: res.options.action,
+    summ: getSumm(res),
+  } : {
+    success: success.count,
+    values: res.values,
+    task: res.task,
+    successMessage: getSuccessMessage(success, res),
     action: res.options.action,
   };
-  if (result.success === 0 && res.one > 0 && !res.options.damage) {
-    result.msg = 'Botch!';
-    return result;
-  }
-  if (!res.options.damage) {
-    result.success = Math.max(result.success - res.one, 0);
-  }
-  if (result.success >= 5) {
-    result.msg = messages[5];
-  }
-  else {
-    result.msg = messages[result.success];
-  }
-  return result;
 }
 
 function resultToStr(res, userName) {
-  const action = res.action && (`Action: ${res.action}\n`) || '';
-  const userNameStr = userName && (`User: @${userName}\n`) || '';
-  return `${userNameStr}Task: ${res.task}\n${action}Result: ${res.values.join(', ')}\nSuccesses: ${res.success}\nMessage: ${res.msg}`;
+  const str = [`User: @${userName}`, `Task: ${res.task}`];
+  if (res.action) {
+    str.push(`Action: ${res.action}`);
+  }
+  str.push(`Result: ${res.values.join(', ')}`);
+  if (res.summ) {
+    str.push(`Summ: ${res.summ}`);
+  } else {
+    str.push(`Successes: ${res.success}`);
+    str.push(`Message: ${res.successMessage}`);
+  }
+  return str.join('\n');
 }
 
 module.exports = {
