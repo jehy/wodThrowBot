@@ -10,7 +10,7 @@ function randomDice(base) {
 
 const specCommand = ['spec', 's', 'ы'];
 const dmgCommand = ['dmg', 'd', 'damage', 'в'];
-const summCommand = ['summ'];
+const summCommand = ['summ', 'sum'];
 
 function getProps(options) {
   let special = false;
