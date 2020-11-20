@@ -63,28 +63,10 @@ describe('Parsing request', () => {
     debug(resStr);
   });
 
-  it('should be able to process input without "x"', () => {
-    const test = '5 8';
-    const params = utils.parseRequest(test);
-    assert.equal(params.diceNumber, 5);
-    assert.equal(params.difficulty, 8);
-    assert.equal(params.special, false);
-    assert.equal(params.damage, false);
-    assert.equal(params.action, '');
-    const res = utils.throwDices(params);
-    const reply = utils.parseResult(res);
-    const resStr = utils.resultToStr(reply);
-    assert.isNotTrue(resStr.includes('damage'));
-    assert.isNotTrue(resStr.includes('special'));
-    assert.isNotTrue(resStr.includes('action'));
-    debug(test);
-    debug(resStr);
-  });
-
   it('should be able to process speciality throws', () => {
-    const test = '5 8 spec';
-    const test2 = '5 8 s';
-    const test3 = '5 8 ы';
+    const test = '5x8 spec';
+    const test2 = '5х8 s';
+    const test3 = '5x8 ы';
     const params = utils.parseRequest(test);
     const params2 = utils.parseRequest(test2);
     const params3 = utils.parseRequest(test3);
@@ -106,10 +88,10 @@ describe('Parsing request', () => {
   });
 
   it('should be able to process damage throws', () => {
-    const test = '5 8 damage';
-    const test2 = '5 8 dmg';
-    const test3 = '5 8 d';
-    const test4 = '5 8 в';
+    const test = '5x8 damage';
+    const test2 = '5x8 dmg';
+    const test3 = '5x8 d';
+    const test4 = '5x8 в';
     const params = utils.parseRequest(test);
     const params2 = utils.parseRequest(test2);
     const params3 = utils.parseRequest(test3);
@@ -133,10 +115,10 @@ describe('Parsing request', () => {
   });
 
   it('should be able to process both speciality and damage throws', () => {
-    const test = '5 8 damage spec';
-    const test2 = '5 8 spec dmg';
-    const test3 = '5 8 d s';
-    const test4 = '5 8 ы в';
+    const test = '5x8 damage spec';
+    const test2 = '5x8 spec dmg';
+    const test3 = '5x8 d s';
+    const test4 = '5x8 ы в';
     const params = utils.parseRequest(test);
     const params2 = utils.parseRequest(test2);
     const params3 = utils.parseRequest(test3);
@@ -297,7 +279,7 @@ describe('passing message', () => {
   });
 
   it('should be able to pass message (no flags, difficulty)', () => {
-    const test = '5 8 Blah-blah blah!';
+    const test = '5x8 Blah-blah blah!';
     const params = utils.parseRequest(test);
     assert.equal(params.diceNumber, 5);
     assert.equal(params.difficulty, 8);
@@ -315,7 +297,7 @@ describe('passing message', () => {
   });
 
   it('should be able to pass (all flags)', () => {
-    const test = '5 8 spec damage Blah-blah blah!';
+    const test = '5x8 spec damage Blah-blah blah!';
     const params = utils.parseRequest(test);
     assert.equal(params.diceNumber, 5);
     assert.equal(params.difficulty, 8);
@@ -332,7 +314,7 @@ describe('passing message', () => {
     debug(resStr);
   });
   it('should be able to fuck goose', () => {
-    const test = '5 7 еби гусей';
+    const test = '5x7 еби гусей';
     const params = utils.parseRequest(test);
     assert.equal(params.diceNumber, 5);
     assert.equal(params.difficulty, 7);
@@ -349,7 +331,7 @@ describe('passing message', () => {
     debug(resStr);
   });
   it('should be able to endure Rider roll', () => {
-    const test = '6 7 No damage intended!';
+    const test = '6x7 No damage intended!';
     const params = utils.parseRequest(test);
     assert.equal(params.diceNumber, 6);
     assert.equal(params.difficulty, 7);
@@ -364,7 +346,7 @@ describe('passing message', () => {
     debug(resStr);
   });
   it('should be able to endure Rider roll (2)', () => {
-    const test = '5 6 damage Damage to troll';
+    const test = '5x6 damage Damage to troll';
     const params = utils.parseRequest(test);
     assert.equal(params.diceNumber, 5);
     assert.equal(params.difficulty, 6);
@@ -375,6 +357,22 @@ describe('passing message', () => {
     const reply = utils.parseResult(res);
     const resStr = utils.resultToStr(reply);
     assert.isTrue(resStr.includes('Action: Damage to troll'));
+    debug(test);
+    debug(resStr);
+  });
+  it('should be able to throw using base', () => {
+    const test = '5d6x6 damage d6 damage';
+    const params = utils.parseRequest(test);
+    assert.equal(params.diceNumber, 5);
+    assert.equal(params.difficulty, 6);
+    assert.equal(params.damage, true);
+    assert.equal(params.base, 6);
+    assert.equal(params.special, false);
+    assert.equal(params.action, 'd6 damage');
+    const res = utils.throwDices(params);
+    const reply = utils.parseResult(res);
+    const resStr = utils.resultToStr(reply);
+    assert.isTrue(resStr.includes('Action: d6 damage'));
     debug(test);
     debug(resStr);
   });

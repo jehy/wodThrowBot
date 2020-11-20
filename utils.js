@@ -2,17 +2,17 @@
 
 const crypto = require('crypto');
 
-function randomDice() {
+function randomDice(base) {
   const randHex = crypto.randomBytes(4)
     .toString('hex');
-  return parseInt(randHex, 16) % 10;
+  return parseInt(randHex, 16) % base + 1;
 }
 
 const specCommand = ['spec', 's', 'ы'];
 const dmgCommand = ['dmg', 'd', 'damage', 'в'];
 
 function parseRequest(str) {
-  let difficulty = 6;
+  /* let difficulty = 6;
   // support for old syntax with x, both russian and english
   if (str[0] === 'x' || str[1] === 'x') { // eng
     str = str.replace('x', ' ');
@@ -24,11 +24,17 @@ function parseRequest(str) {
   const diceNumber = parseInt(arr[0], 10);
   if (!Number.isNaN(parseInt(arr[1], 10))) {
     difficulty = parseInt(arr[1], 10);
+  } */
+  if (str.length > 120) {
+    throw new Error('You really like long things, dont you?');
   }
-  const {special, damage, action} = arr.reduce((res, element, index) => {
-    if (index === 0 || index === 1 && !Number.isNaN(parseInt(element, 10))) {
-      return res; // number of dice and difficuly
-    }
+  const arr = str.match(/(\d{0,2})d{0,1}(\d{0,2})(x|х{0,1})(\d{0,2})/i);
+  // console.log(`${str}=>${JSON.stringify(arr)}`);
+  const diceNumber = parseInt(arr[1], 10);
+  const base = parseInt(arr[2], 10) || 10;
+  const difficulty = parseInt(arr[4], 10) || 6;
+  const options = str.replace(arr[0], '').trim().split(' ');
+  const {special, damage, action} = options.reduce((res, element, index) => {
     if (!res.actionMessageStarted && !res.special && specCommand.includes(element) && index < 4) {
       res.special = true;
       return res;
@@ -49,20 +55,20 @@ function parseRequest(str) {
   if (Number.isNaN(diceNumber)) {
     throw new Error('Wrong value for dice number!');
   }
-  if (diceNumber > 20) {
+  if (diceNumber > 30) {
     throw new Error('Please spare me, Kain!');
   }
-  if (difficulty > 10) {
+  if (difficulty > base) {
     throw new Error('You don`t like easy task, yeah?');
   }
   return {
-    difficulty, diceNumber, special, damage, action,
+    difficulty, diceNumber, special, damage, action, base,
   };
 }
 
 function throwDices(options) {
   const {
-    difficulty, diceNumber, special, damage,
+    difficulty, diceNumber, special, damage, base,
   } = options;
   const res = {
     values: [],
@@ -71,6 +77,9 @@ function throwDices(options) {
     task: `throwing ${diceNumber} dices with ${difficulty} difficulty`,
     options,
   };
+  if (base !== 10) {
+    res.task += ` base ${base}`;
+  }
   if (special) {
     res.task += ' using speciality';
   }
@@ -78,11 +87,11 @@ function throwDices(options) {
     res.task += ' (damage, 1 is only fail)';
   }
   for (let i = 0; i < diceNumber; i++) {
-    const val = randomDice();
+    const val = randomDice(base);
     if (val === 1) {
       res.one++;
     }
-    else if (val === 0) {
+    else if (val === 10) {
       if (special) {
         res.success += 2;
       }

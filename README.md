@@ -6,13 +6,13 @@
 [![Coverage Status](https://coveralls.io/repos/github/jehy/wodThrowBot/badge.svg?branch=master)](https://coveralls.io/github/jehy/wodThrowBot?branch=master)
 [![Known Vulnerabilities](https://snyk.io/test/github/jehy/wodThrowBot/badge.svg)](https://snyk.io/test/github/jehy/wodThrowBot)
 
-Simple bor for throwing dices in VTM mechanics.
+Simple bot for throwing dices in VTM and other mechanics.
 
 You can find it on telegram as `@WodThrowBot`.
 
 #### Syntax
 ```
-/roll numberDice [difficulty] [spec] [damage] [action]
+/roll numberDice[d][base][x][difficulty] [spec] [damage] [action]
 ```
 
 ##### Where
@@ -23,15 +23,16 @@ You can find it on telegram as `@WodThrowBot`.
 * `action` description of what you're doing
 
 ##### Examples
-* `/roll 5` - roll 5 dices with base difficulty 6
-* `/roll 5 8` - roll 5 dices with difficulty 8
-* `/roll 5 8 spec damage` or `/roll 5 8 s d` - roll 5 dices with difficulty 8 using speciality and damage option
-* `/roll 5 8 s d mighty action` - same as above with comment "mighty action"
+* `/roll 5` - roll 5 d10 dices with base difficulty 6
+* `/roll 5x8` - roll 5 d10 dices with difficulty 8
+* `/roll 5d6x8` - roll 5 d6 dices with difficulty 8
+* `/roll 5x8 spec damage` or `/roll 5 8 s d` - roll 5 d10 dices with difficulty 8 using speciality and damage option
+* `/roll 5x8 s d mighty action` - same as above with comment "mighty action"
 
 #### For geeks
 
 You can also use this package via cli, like
 
 ```bash
-npx wodthrowbot 5 8 s d rolling stones
+npx wodthrowbot 5x8 s d rolling stones
 ```
