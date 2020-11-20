@@ -48,20 +48,20 @@ function getProps(options) {
 
 function getTask(options)
 {
-  let task = `throwing ${options.diceNumber} dices`;
+  const task = [`throwing ${options.diceNumber} dices`];
   if (!options.summ) {
-    task += `with ${options.difficulty} difficulty`;
+    task.push(`with ${options.difficulty} difficulty`);
+    if (options.special) {
+      task.push('using speciality');
+    }
+    if (options.damage) {
+      task.push('(damage, 1 does not subtract)');
+    }
   }
   if (options.base !== 10) {
-    task += ` base ${options.base}`;
+    task.push(`base ${options.base}`);
   }
-  if (options.special) {
-    task += ' using speciality';
-  }
-  if (options.damage) {
-    task += ' (damage, 1 does not subtract)';
-  }
-  return task;
+  return task.join(' ');
 }
 
 function parseRequest(str) {
