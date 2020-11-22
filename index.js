@@ -5,7 +5,9 @@ const config = require('config');
 const debug = require('debug')('throwBot');
 const Promise = require('bluebird');
 
-const utils = require('./utils');
+const {parseResult, resultToStr} = require('./lib/output');
+const {parseRequest} = require('./lib/parseInput');
+const {throwDices} = require('./lib/throw');
 
 // replace the value below with the Telegram token you receive from @BotFather
 const {token} = config.telegram;
@@ -64,10 +66,10 @@ function messageToCommand(msg, inline = false)
 }
 
 async function processMessage(command, userName) {
-  const params = utils.parseRequest(command);
-  const res = utils.throwDices(params);
-  const reply = utils.parseResult(params, res);
-  return {text: utils.resultToStr(reply, userName), task: params.task};
+  const params = parseRequest(command);
+  const res = throwDices(params);
+  const reply = parseResult(params, res);
+  return {text: resultToStr(reply, userName), task: params.task};
 }
 
 bot.on('inline_query', async (msg)=>{

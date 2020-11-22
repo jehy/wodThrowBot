@@ -12,7 +12,7 @@ You can find it on telegram as `@WodThrowBot`.
 
 #### Syntax
 ```
-/roll numberDice[d][base][x][difficulty] [spec] [damage] [action]
+/roll numberDice[d(base)=10][x(difficulty)=6] [spec] [damage] [action] [sum]
 ```
 
 ##### Where
@@ -26,6 +26,7 @@ You can find it on telegram as `@WodThrowBot`.
 * `/roll 5` - roll 5 d10 dices with base difficulty 6
 * `/roll 5x8` - roll 5 d10 dices with difficulty 8
 * `/roll 5d6x8` - roll 5 d6 dices with difficulty 8
+* `/roll 5d6 sum` - roll 5 d6 dices and count sum
 * `/roll 5x8 spec damage` or `/roll 5 8 s d` - roll 5 d10 dices with difficulty 8 using speciality and damage option
 * `/roll 5x8 s d mighty action` - same as above with comment "mighty action"
 

@@ -8,7 +8,7 @@
   },
   "scripts": {
     "start": "DEBUG=throwBot node --use_strict index.js",
-    "lint": "./node_modules/.bin/eslint index.js utils.js test bin",
+    "lint": "./node_modules/.bin/eslint index.js lib test bin",
     "test": "mocha -t 10000 --exit",
     "test_verbose": "DEBUG=throwBot:test mocha -t 10000 --exit",
     "check_coverage": "nyc check-coverage --lines 80 --functions 80 --branches 80",
