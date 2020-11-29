@@ -17,7 +17,7 @@ describe('Some simple tests', () => {
   });
 
   describe('should be able to process some inputs', () => {
-    const tests = ['5x8', '3d6x6', '3d6 sum', '3d6 summ', '5d6x4 summ damage spec'];
+    const tests = ['5x8', '3d6x6', '3d6 sum', '3d6 sum', '5d6x4 sum damage spec'];
     tests.forEach((test)=>{
       it(test, ()=>{
         for (let i = 0; i < 100; i++) {
@@ -246,19 +246,19 @@ describe('counting successes', () => {
       successMessage: 'Success... Moderate.',
     });
   });
-  it('should count summ', () => {
+  it('should count sum', () => {
     const diceResult = {
       values: [1, 2, 3],
     };
     const params = {
-      task: 'some task', action: 'some action', summ: true, difficulty: 6,
+      task: 'some task', action: 'some action', sum: true, difficulty: 6,
     };
     const reply = parseResult(params, diceResult);
     assert.deepEqual(reply, {
       values: [1, 2, 3],
       action: 'some action',
       task: 'some task',
-      summ: 6,
+      sum: 6,
     });
   });
 });
