@@ -80,12 +80,16 @@ bot.on('inline_query', async (msg)=>{
   }
   const chatId =  msg.from.id;
   const command = messageToCommand(msg, true);
+  if (!command) {
+    return;
+  }
   let res;
   try {
     res = await processMessage(command, msg.from.username);
   }
   catch (e) {
     await bot.sendMessage(chatId, e.toString());
+    debug(e);
     return;
   }
   if (!res) {
@@ -109,6 +113,9 @@ bot.on('message', async (msg)=>{
     return;
   }
   const command = messageToCommand(msg);
+  if (!command) {
+    return;
+  }
   const chatId = msg.chat.id || msg.from.id;
   let res;
   try {
@@ -116,6 +123,7 @@ bot.on('message', async (msg)=>{
   }
   catch (e) {
     await bot.sendMessage(chatId, e.toString());
+    debug(e);
     return;
   }
   if (!res) {

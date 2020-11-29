@@ -181,6 +181,21 @@ describe('counting successes', () => {
     });
   });
 
+  it('should count botches as botches', () => {
+    const diceResult = {
+      values: [1, 5, 4, 4, 1, 5],
+    };
+    const params = {task: 'some task', action: 'some action', difficulty: 6};
+    const reply = parseResult(params, diceResult);
+    assert.deepEqual(reply, {
+      success: 0,
+      values: [1, 5, 4, 4, 1, 5],
+      task: 'some task',
+      action: 'some action',
+      successMessage: 'Botch!',
+    });
+  });
+
   it('should count successes and not subtract botches in damage mode', () => {
     const diceResult = {
       values: [1, 7],
