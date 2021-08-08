@@ -276,6 +276,21 @@ describe('counting successes', () => {
       max: 3,
     });
   });
+  it('should count min', () => {
+    const diceResult = {
+      values: [1, 2, 3],
+    };
+    const params = {
+      task: 'some task', action: 'some action', min: true, difficulty: 6,
+    };
+    const reply = parseResult(params, diceResult);
+    assert.deepEqual(reply, {
+      values: [1, 2, 3],
+      action: 'some action',
+      task: 'some task',
+      min: 1,
+    });
+  });
 });
 describe('passing message', () => {
 
