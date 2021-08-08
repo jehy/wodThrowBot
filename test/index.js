@@ -261,6 +261,21 @@ describe('counting successes', () => {
       sum: 6,
     });
   });
+  it('should count max', () => {
+    const diceResult = {
+      values: [1, 2, 3],
+    };
+    const params = {
+      task: 'some task', action: 'some action', max: true, difficulty: 6,
+    };
+    const reply = parseResult(params, diceResult);
+    assert.deepEqual(reply, {
+      values: [1, 2, 3],
+      action: 'some action',
+      task: 'some task',
+      max: 3,
+    });
+  });
 });
 describe('passing message', () => {
 
