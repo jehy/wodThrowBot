@@ -8,11 +8,12 @@
 
 Simple bot for throwing dices in VTM and other mechanics.
 
-You can find it on telegram as `@WodThrowBot`.
+You can find it on telegram as `@WodThrowBot`. You can send messages directly to bot
+or add it to group and use inline commands.
 
 #### Syntax
 ```
-/roll numberDice[d(base)=10][x(difficulty)=6] [spec] [damage] [action] [sum]
+/roll numberDice[d(base)=10][x(difficulty)=6] [spec] [damage] [sum] [min] [max] [action]
 ```
 
 ##### Where
@@ -20,6 +21,8 @@ You can find it on telegram as `@WodThrowBot`.
 * `difficulty` is a difficulty, lol
 * `spec` if you are using speciality (10 counts as 2x successes)
 * `damage` if you're gonna roll damage (1 does not subtract successes)
+* `min` - show minimal dice value
+* `max` - show maximal dice value
 * `action` description of what you're doing
 
 ##### Examples
@@ -27,8 +30,9 @@ You can find it on telegram as `@WodThrowBot`.
 * `/roll 5x8` - roll 5 d10 dices with difficulty 8
 * `/roll 5d6x8` - roll 5 d6 dices with difficulty 8
 * `/roll 5d6 sum` - roll 5 d6 dices and count sum
+* `/roll 5d6 max` - roll 5 d6 dices and count max value
 * `/roll 5x8 spec damage` or `/roll 5 8 s d` - roll 5 d10 dices with difficulty 8 using speciality and damage option
-* `/roll 5x8 s d mighty action` - same as above with comment "mighty action"
+* `/roll 5x8 s d kill troll` - same as above with comment "kill troll"
 
 #### For geeks
 
