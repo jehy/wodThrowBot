@@ -10,7 +10,19 @@ Simple bot for throwing dices in VTM and other mechanics.
 
 You can find it on telegram as `@WodThrowBot`. You can send messages directly to bot
 or add it to group and use inline commands.
+#### Install with docker compose
+```yml
+version: '3.9'
 
+services:
+  wodthrowbot:
+    image: ghcr.io/jehy/wodthrowbot/wod-throw-bot:latest
+    volumes:
+      - "config:/app/config:ro"
+volumes:
+  config:
+```
+And them simply add `runtime.config` with your telegram token to config volume.
 #### Syntax
 ```
 /roll numberDice[d(base)=10][x(difficulty)=6] [spec] [damage] [sum] [min] [max] [action]

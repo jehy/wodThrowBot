@@ -3,7 +3,6 @@
 const TelegramBot = require('node-telegram-bot-api');
 const config = require('config');
 const debug = require('debug')('throwBot');
-const Promise = require('bluebird');
 
 const {parseResult, resultToStr} = require('./lib/output');
 const {parseRequest} = require('./lib/parseInput');
@@ -14,6 +13,10 @@ const {token} = config.telegram;
 
 // Create a bot that uses 'polling' to fetch new updates
 const bot = new TelegramBot(token, {polling: true});
+
+async function delay(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 bot.on('polling_error', (error) => {
   debug('Polling error', error);  // => 'EFATAL'
@@ -129,8 +132,8 @@ bot.on('message', async (msg)=>{
   if (!res) {
     return;
   }
-  await Promise.delay(200);
+  await delay(200);
   await bot.sendChatAction(chatId, 'typing');
-  await Promise.delay(2000);
+  await delay(2000);
   await bot.sendMessage(chatId, res.text);
 });
