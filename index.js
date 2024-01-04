@@ -15,7 +15,7 @@ const {token} = config.telegram;
 const bot = new TelegramBot(token, {polling: true});
 
 async function delay(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise((resolve) => { setTimeout(resolve, ms); });
 }
 
 bot.on('polling_error', (error) => {
