@@ -1,8 +1,6 @@
 # WodThrowBot
 
 ![Build](https://github.com/jehy/wodThrowBot/workflows/Build/badge.svg)
-[![dependencies Status](https://david-dm.org/jehy/wodThrowBot/status.svg)](https://david-dm.org/jehy/wodThrowBot)
-[![devDependencies Status](https://david-dm.org/jehy/wodThrowBot/dev-status.svg)](https://david-dm.org/jehy/wodThrowBot?type=dev)
 [![Coverage Status](https://coveralls.io/repos/github/jehy/wodThrowBot/badge.svg?branch=master)](https://coveralls.io/github/jehy/wodThrowBot?branch=master)
 [![Known Vulnerabilities](https://snyk.io/test/github/jehy/wodThrowBot/badge.svg)](https://snyk.io/test/github/jehy/wodThrowBot)
 
