@@ -19,26 +19,30 @@ async function delay(ms) {
 }
 
 bot.on('polling_error', (error) => {
-  debug('Polling error', error);  // => 'EFATAL'
+  debug('Polling error', error.message);  // => 'EFATAL'
   debug(error);
 });
 
 bot.on('webhook_error', (error) => {
-  debug('Webhook error', error);  // => 'EPARSE'
+  debug('Webhook error', error.message);  // => 'EPARSE'
 });
 
 // Matches "/echo [whatever]"
 bot.onText(/\/start/, async (msg) => {
   debug('start message from user');
   const chatId = msg.chat.id || msg.from.id;
-  await bot.sendMessage(chatId, 'Please enter message'
+  try {
+    await bot.sendMessage(chatId, 'Please enter message'
     + ' as "axb" where a is a number of dice and b'
     + ' is difficulty. You can also add keyword "spec"'
     + ' if it is speciality or "damage" if it is damage.', {
-    reply_markup: JSON.stringify({
-      remove_keyboard: true,
-    }),
-  });
+      reply_markup: JSON.stringify({
+        remove_keyboard: true,
+      }),
+    });
+  } catch (err) {
+    debug(`Failed to send start message to user: ${err.message}`);
+  }
 });
 
 // Listen for any kind of message. There are different kinds of
@@ -68,7 +72,7 @@ function messageToCommand(msg, inline = false)
 
 }
 
-async function processMessage(command, userName) {
+function processMessage(command, userName) {
   const params = parseRequest(command);
   const res = throwDices(params);
   const reply = parseResult(params, res);
@@ -88,10 +92,10 @@ bot.on('inline_query', async (msg)=>{
   }
   let res;
   try {
-    res = await processMessage(command, msg.from.username);
+    res = processMessage(command, msg.from.username);
   }
   catch (e) {
-    await bot.sendMessage(chatId, e.toString());
+    await bot.sendMessage(chatId, e.toString()).catch((err)=>debug(`failed to send error to user: ${err}`));
     debug(e);
     return;
   }
@@ -105,7 +109,8 @@ bot.on('inline_query', async (msg)=>{
     description: res.task,
     input_message_content: {message_text: res.text},
   };
-  await bot.answerInlineQuery(msg.id, [inlineQueryResult], {cache_time: 0});
+  await bot.answerInlineQuery(msg.id, [inlineQueryResult], {cache_time: 0})
+    .catch((err)=>debug(`failed to send inline result to user: ${err}`));
 });
 
 bot.on('message', async (msg)=>{
@@ -122,18 +127,22 @@ bot.on('message', async (msg)=>{
   const chatId = msg.chat.id || msg.from.id;
   let res;
   try {
-    res = await processMessage(command, msg.from.username);
+    res = processMessage(command, msg.from.username);
   }
   catch (e) {
-    await bot.sendMessage(chatId, e.toString());
-    debug(e);
+    await bot.sendMessage(chatId, e.toString()).catch((err)=>debug(`failed to send error to user: ${err}`));
+    debug(e.message);
     return;
   }
   if (!res) {
     return;
   }
   await delay(200);
-  await bot.sendChatAction(chatId, 'typing');
+  await bot.sendChatAction(chatId, 'typing').catch((err)=>debug(`failed to send typing to user: ${err}`));
   await delay(2000);
-  await bot.sendMessage(chatId, res.text);
+  try {
+    await bot.sendMessage(chatId, res.text);
+  } catch (err) {
+    debug(`Failed to send message to user: ${err.message}`);
+  }
 });
