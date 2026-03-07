@@ -1,7 +1,6 @@
 'use strict';
 
 const TelegramBot = require('node-telegram-bot-api');
-const config = require('config');
 const debug = require('debug')('throwBot');
 
 const {parseResult, resultToStr} = require('./lib/output');
@@ -9,7 +8,10 @@ const {parseRequest} = require('./lib/parseInput');
 const {throwDices} = require('./lib/throw');
 
 // replace the value below with the Telegram token you receive from @BotFather
-const {token} = config.telegram;
+const token = process.env.TELEGRAM_TOKEN;
+if (!token) {
+  throw new Error('TELEGRAM_TOKEN is not set');
+}
 
 // Create a bot that uses 'polling' to fetch new updates
 const bot = new TelegramBot(token, {polling: true});

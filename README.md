@@ -16,12 +16,13 @@ version: '3.9'
 services:
   wodthrowbot:
     image: ghcr.io/jehy/wodthrowbot/wod-throw-bot:latest
-    volumes:
-      - "config:/app/config:ro"
+    environment:
+      TELEGRAM_TOKEN: ${TELEGRAM_TOKEN}
 volumes:
   config:
 ```
-And them simply add `runtime.config` with your telegram token to config volume.
+
+Set `TELEGRAM_TOKEN` value to token from [@BotFather](https://t.me/BotFather)
 
 #### Syntax
 ```
