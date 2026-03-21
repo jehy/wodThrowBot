@@ -7,6 +7,9 @@ name: publish
 on: [push]
 jobs:
   build-and-publish-latest:
+    permissions:
+      contents: read
+      packages: write  # Explicitly grant write access to packages
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/master' # Running this job only for master branch
 

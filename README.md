@@ -1,6 +1,6 @@
 # WodThrowBot
 
-![Build](https://github.com/jehy/wodThrowBot/workflows/Build/badge.svg)
+![Test](https://github.com/jehy/wodThrowBot/workflows/Test/badge.svg)
 [![Coverage Status](https://coveralls.io/repos/github/jehy/wodThrowBot/badge.svg?branch=master)](https://coveralls.io/github/jehy/wodThrowBot?branch=master)
 [![Known Vulnerabilities](https://snyk.io/test/github/jehy/wodThrowBot/badge.svg)](https://snyk.io/test/github/jehy/wodThrowBot)
 
