@@ -16,6 +16,7 @@ version: '3.9'
 services:
   wodthrowbot:
     image: ghcr.io/jehy/wodthrowbot/wod-throw-bot:latest
+    container_name: gotogram
     restart: unless-stopped
     deploy:
       resources:
@@ -24,8 +25,6 @@ services:
           memory: 200M
     environment:
       TELEGRAM_TOKEN: ${TELEGRAM_TOKEN}
-volumes:
-  config:
 ```
 
 Set `TELEGRAM_TOKEN` value to token from [@BotFather](https://t.me/BotFather)
