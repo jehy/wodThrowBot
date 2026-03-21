@@ -16,6 +16,12 @@ version: '3.9'
 services:
   wodthrowbot:
     image: ghcr.io/jehy/wodthrowbot/wod-throw-bot:latest
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.3'
+          memory: 200M
     environment:
       TELEGRAM_TOKEN: ${TELEGRAM_TOKEN}
 volumes:
